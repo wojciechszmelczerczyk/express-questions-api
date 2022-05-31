@@ -2,6 +2,8 @@ const express = require('express')
 const { urlencoded, json } = require('body-parser')
 const makeRepositories = require('./middleware/repositories')
 
+const { v4: uuidv4 } = require('uuid')
+
 const STORAGE_FILE_PATH = 'questions.json'
 const PORT = 3000
 
@@ -28,8 +30,14 @@ app.get('/questions/:questionId', async (req, res) => {
 })
 
 app.post('/questions', async (req, res) => {
-  let question = req.body
-  const newQuestion = await req.repositories.questionRepo.addQuestion(question)
+  const { id = uuidv4(), author, summary, answers = [] } = req.body
+
+  const newQuestion = await req.repositories.questionRepo.addQuestion({
+    id,
+    author,
+    summary,
+    answers
+  })
 
   res.json(newQuestion)
 })

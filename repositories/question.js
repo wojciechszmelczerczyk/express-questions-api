@@ -1,4 +1,4 @@
-const { readFile } = require('fs/promises')
+const { readFile, writeFile } = require('fs/promises')
 
 const makeQuestionRepository = fileName => {
   const getQuestions = async () => {
@@ -18,7 +18,16 @@ const makeQuestionRepository = fileName => {
   const addQuestion = async question => {
     const fileContent = await readFile(fileName, { encoding: 'utf-8' })
     const questions = JSON.parse(fileContent)
+
+    // add new question
     questions.push(question)
+
+    // assign modified stringified question array to variable
+    let arr = JSON.stringify(questions)
+
+    // write new array to file
+    await writeFile(fileName, arr, { encoding: 'utf-8' })
+
     return questions
   }
 
