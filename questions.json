@@ -21,5 +21,17 @@
         "author": "Sarah Nickle",
         "summary": "Who let the dogs out?",
         "answers": []
+    },
+    {
+        "id": "a6df8350-d8c0-4fd0-b583-3e6e28ee8971",
+        "author": "Wojciech Nowak",
+        "summary": "How fast light travel?",
+        "answers": [
+            {
+                "id": "8c35be1c-f3ec-4d75-9f43-8d36056a3f48",
+                "author": "Michal Kowalski",
+                "summary": "300000km/s"
+            }
+        ]
     }
 ]

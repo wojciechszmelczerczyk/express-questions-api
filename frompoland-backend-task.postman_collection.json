@@ -1,0 +1,229 @@
+{
+	"info": {
+		"_postman_id": "76c2eed7-6dbf-44f1-88aa-c7568cbdcbf3",
+		"name": "frompoland-backend-task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16678431"
+	},
+	"item": [
+		{
+			"name": "index",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get questions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/questions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"questions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get single question",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/questions/:questionId",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"questions",
+						":questionId"
+					],
+					"variable": [
+						{
+							"key": "questionId",
+							"value": "{{questionId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create question",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"author\":\"Wojciech Nowak\",\n    \"summary\":\"How fast light travel?\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/questions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"questions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get answers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/questions/:questionId/answers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"questions",
+						":questionId",
+						"answers"
+					],
+					"variable": [
+						{
+							"key": "questionId",
+							"value": "{{questionId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get answer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/questions/:questionId/answers/:answerId",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"questions",
+						":questionId",
+						"answers",
+						":answerId"
+					],
+					"variable": [
+						{
+							"key": "questionId",
+							"value": "{{questionId}}"
+						},
+						{
+							"key": "answerId",
+							"value": "{{answerId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create answer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"author\": \"Michal Kowalski\",\n    \"summary\": \"300000km/s\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/questions/:questionId/answers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"questions",
+						":questionId",
+						"answers"
+					],
+					"variable": [
+						{
+							"key": "questionId",
+							"value": "a6df8350-d8c0-4fd0-b583-3e6e28ee8971"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "questionId",
+			"value": "a6df8350-d8c0-4fd0-b583-3e6e28ee8971",
+			"type": "string"
+		},
+		{
+			"key": "answerId",
+			"value": "8c35be1c-f3ec-4d75-9f43-8d36056a3f48",
+			"type": "string"
+		}
+	]
+}

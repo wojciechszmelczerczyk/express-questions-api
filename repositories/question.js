@@ -65,9 +65,9 @@ const makeQuestionRepository = fileName => {
             }
           }
         })
+        return answer
       }
     }
-    return answer
   }
   const addAnswer = async (questionId, answer) => {
     const fileContent = await readFile(fileName, { encoding: 'utf-8' })
