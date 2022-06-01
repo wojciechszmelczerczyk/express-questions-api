@@ -9,10 +9,29 @@ const makeQuestionRepository = fileName => {
   }
 
   const getQuestionById = async questionId => {
-    const fileContent = await readFile(fileName, { encoding: 'utf-8' })
-    const questions = JSON.parse(fileContent)
+    // uuid regex for validation purposes
+    const uuidReg = new RegExp(
+      /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+    )
 
-    return questions.filter(question => question.id === questionId)
+    try {
+      if (typeof questionId === 'string' && !parseInt(questionId)) {
+        if (questionId.match(uuidReg)) {
+          const fileContent = await readFile(fileName, { encoding: 'utf-8' })
+          const questions = JSON.parse(fileContent)
+
+          return questions.filter(question => question.id === questionId)
+        } else {
+          throw new Error("id doesn't match uuidv4 pattern")
+        }
+      } else {
+        throw new Error('id has to be a string value')
+      }
+    } catch (err) {
+      if (err.message.includes('string value'))
+        return { id_is_not_string_value: err.message }
+      return { id_doesnt_match_regex: err.message }
+    }
   }
 
   const addQuestion = async question => {

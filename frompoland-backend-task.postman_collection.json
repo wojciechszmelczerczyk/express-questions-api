@@ -45,7 +45,7 @@
 			"response": []
 		},
 		{
-			"name": "get single question",
+			"name": "get question",
 			"request": {
 				"method": "GET",
 				"header": [],
