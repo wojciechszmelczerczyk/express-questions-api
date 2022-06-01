@@ -37,7 +37,10 @@ const makeQuestionRepository = fileName => {
   const addQuestion = async question => {
     try {
       if (typeof question['author'] === 'string') {
-        if (typeof question === 'string' && question.includes('?')) {
+        if (
+          typeof question['summary'] === 'string' &&
+          question['summary'].includes('?')
+        ) {
           const fileContent = await readFile(fileName, { encoding: 'utf-8' })
           const questions = JSON.parse(fileContent)
 
