@@ -108,4 +108,52 @@ describe('question repository', () => {
     // expect new list length to be greater by 1 (new question added)
     expect(listWithNewQuestion.length).toBe(questionsListLength + 1)
   })
+
+  test('get answers of specific question', async () => {
+    // user id
+    let id = faker.datatype.uuid()
+
+    // sample questions
+    const testQuestions = [
+      {
+        id,
+        summary: 'What is my name?',
+        author: 'Jack London',
+        answers: []
+      },
+      {
+        id: faker.datatype.uuid(),
+        summary: 'Who are you?',
+        author: 'Tim Doods',
+        answers: []
+      }
+    ]
+
+    // write questions to file
+    await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+    // new answer object
+    const newAnswer = {
+      id: faker.datatype.uuid(),
+      summary: 'test',
+      author: 'Andrew Dude'
+    }
+
+    // add new answer
+    await questionRepo.addAnswer(id, newAnswer)
+
+    // read modified questions list with brand new added answer and parse to object
+    const questions = JSON.parse(
+      await readFile(TEST_QUESTIONS_FILE_PATH, { encoding: 'utf-8' })
+    )
+
+    // find question with provided id
+    const [question] = questions.filter(question => question.id === id)
+
+    // check if answers list is equal to 1 (new added answer),
+    expect(question['answers'].length).toBe(1)
+
+    // check if author match provided data
+    expect(question['answers'][0]['author']).toBe(newAnswer.author)
+  })
 })
