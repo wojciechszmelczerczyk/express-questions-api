@@ -97,7 +97,7 @@ describe('question repository', () => {
   })
 
   describe('POST /questions', () => {
-    test('should add new question', async () => {
+    test('when question datatype is correct add new question', async () => {
       // questions list
       const testQuestions = [
         {
@@ -141,10 +141,47 @@ describe('question repository', () => {
       // expect new list length to be greater by 1 (new question added)
       expect(listWithNewQuestion.length).toBe(questionsListLength + 1)
     })
+
+    test('when question datatype is incorrect return error message', async () => {
+      // questions list
+      const testQuestions = [
+        {
+          id: faker.datatype.uuid(),
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
+
+      // new question
+      const newQuestion = {
+        id: faker.datatype.uuid(),
+        summary: 5,
+        author: 'Norman Kowalsky',
+        answers: []
+      }
+
+      // write base 2 questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      // add new question
+      const res_err = await questionRepo.addQuestion(newQuestion)
+
+      // expect new list length to be greater by 1 (new question added)
+      expect(res_err['invalid_question']).toBe(
+        'Inappropriate question provided. Value has to be string with question mark'
+      )
+    })
   })
 
   describe('GET /questions/:questionId/answers', () => {
-    test('should return answers of specific question', async () => {
+    test('when id datatype is correct and match uuid regex return answers of specific question', async () => {
       // user id
       let id = faker.datatype.uuid()
 
