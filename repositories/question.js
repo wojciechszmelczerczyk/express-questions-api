@@ -35,19 +35,44 @@ const makeQuestionRepository = fileName => {
   }
 
   const addQuestion = async question => {
-    const fileContent = await readFile(fileName, { encoding: 'utf-8' })
-    const questions = JSON.parse(fileContent)
+    try {
+      if (
+        typeof question['author'] === 'string' &&
+        !parseInt(question['author'])
+      ) {
+        if (
+          typeof question === 'string' &&
+          !parseInt(question) &&
+          question.includes('?')
+        ) {
+          const fileContent = await readFile(fileName, { encoding: 'utf-8' })
+          const questions = JSON.parse(fileContent)
 
-    // add new question
-    questions.push(question)
+          // add new question
+          questions.push(question)
 
-    // assign modified stringified question array to variable
-    let arr = JSON.stringify(questions)
+          // assign modified stringified question array to variable
+          let arr = JSON.stringify(questions)
 
-    // write new array to file
-    await writeFile(fileName, arr, { encoding: 'utf-8' })
+          // write new array to file
+          await writeFile(fileName, arr, { encoding: 'utf-8' })
 
-    return questions
+          return questions
+        } else {
+          throw new Error(
+            'Inappropriate question provided. Value has to be string with question mark'
+          )
+        }
+      } else {
+        throw new Error(
+          'Inappropriate author name provided. Name has to be string'
+        )
+      }
+    } catch (err) {
+      if (err.message.includes('question'))
+        return { invalid_question: err.message }
+      return { invalid_author_name: err.message }
+    }
   }
 
   const getAnswers = async questionId => {
