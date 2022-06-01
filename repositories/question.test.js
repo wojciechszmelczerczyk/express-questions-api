@@ -109,7 +109,7 @@ describe('question repository', () => {
     expect(listWithNewQuestion.length).toBe(questionsListLength + 1)
   })
 
-  test('get answers of specific question', async () => {
+  test('should return answers of specific question', async () => {
     // user id
     let id = faker.datatype.uuid()
 
@@ -213,5 +213,67 @@ describe('question repository', () => {
 
     // expect answer author field match first answer author field
     expect(answer['author']).toBe(firstAnswer.author)
+  })
+
+  test('should add new answer', async () => {
+    // question id
+    let questionId = faker.datatype.uuid()
+
+    // sample questions
+    const testQuestions = [
+      {
+        id: questionId,
+        summary: 'What is my name?',
+        author: 'Jack London',
+        answers: []
+      },
+      {
+        id: faker.datatype.uuid(),
+        summary: 'Who are you?',
+        author: 'Tim Doods',
+        answers: []
+      }
+    ]
+
+    // new answer object
+    const newAnswer = {
+      id: faker.datatype.uuid(),
+      summary: 'test',
+      author: 'Andrew Dude'
+    }
+
+    // write questions to file
+    await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+    // read file with base questions
+    const questions = JSON.parse(
+      await readFile(TEST_QUESTIONS_FILE_PATH, { encoding: 'utf-8' })
+    )
+
+    // get question by provided id
+    const [question] = questions.filter(question => question.id === questionId)
+
+    // save answers list length (0)
+    const answersListLength = question['answers'].length
+
+    // add new answer
+    await questionRepo.addAnswer(questionId, newAnswer)
+
+    // read modified list
+    const modifiedQuestions = JSON.parse(
+      await readFile(TEST_QUESTIONS_FILE_PATH, { encoding: 'utf-8' })
+    )
+
+    // get question by id
+    const [question2] = modifiedQuestions.filter(
+      question => question.id === questionId
+    )
+
+    // now answers list of question is equal to 1 (new question added)
+    const modifiedAnswersListLength = question2['answers'].length
+
+    // after answer addition expect new answers list
+    // to be greater than one before addition
+    expect(modifiedAnswersListLength).toBeGreaterThan(answersListLength)
   })
 })
