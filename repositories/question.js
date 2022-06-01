@@ -153,29 +153,70 @@ const makeQuestionRepository = fileName => {
     }
   }
   const addAnswer = async (questionId, answer) => {
-    const fileContent = await readFile(fileName, { encoding: 'utf-8' })
+    // uuid regex for validation purposes
+    const uuidReg = new RegExp(
+      /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+    )
 
-    // all questions
-    const questions = JSON.parse(fileContent)
+    try {
+      if (typeof questionId === 'string' && questionId.match(uuidReg)) {
+        if (
+          typeof answer['author'] === 'string' &&
+          !parseInt(answer['author'])
+        ) {
+          if (
+            typeof answer['summary'] === 'string' &&
+            !parseInt(answer['summary'])
+          ) {
+            const fileContent = await readFile(fileName, { encoding: 'utf-8' })
 
-    // question with specific id
-    const [question] = questions.filter(question => question.id === questionId)
+            // all questions
+            const questions = JSON.parse(fileContent)
 
-    // iterate on question fields and find answers property
-    for (prop in question) {
-      if (prop === 'answers') {
-        // push answer to answers array property
-        question[prop].push(answer)
+            // question with specific id
+            const [question] = questions.filter(
+              question => question.id === questionId
+            )
 
-        // save in json file new array
-        await writeFile(fileName, JSON.stringify(questions), {
-          encoding: 'utf-8'
-        })
+            // iterate on question fields and find answers property
+            for (prop in question) {
+              if (prop === 'answers') {
+                // push answer to answers array property
+                question[prop].push(answer)
+
+                // save in json file new array
+                await writeFile(fileName, JSON.stringify(questions), {
+                  encoding: 'utf-8'
+                })
+              }
+            }
+
+            // return new added answer
+            return answer
+          } else {
+            throw new Error(
+              "Incorrect answer's title provided. Title has to be string type."
+            )
+          }
+        } else {
+          throw new Error(
+            "Incorrect answer's author provided. Author has to be string type."
+          )
+        }
+      } else {
+        throw new Error(
+          'Incorrect id provided. Id has to be string type and match uuid regex pattern.'
+        )
+      }
+    } catch (err) {
+      if (err.message.includes('title'))
+        return { incorrect_answer_title: err.message }
+      else if (err.message.includes('author'))
+        return { incorrect_answer_author: err.message }
+      return {
+        incorrect_id_provided: err.message
       }
     }
-
-    // return new added answer
-    return answer
   }
 
   return {
