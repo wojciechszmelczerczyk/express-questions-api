@@ -15,7 +15,7 @@ const makeQuestionRepository = fileName => {
     )
 
     try {
-      if (typeof questionId === 'string' && !parseInt(questionId)) {
+      if (typeof questionId === 'string') {
         if (questionId.match(uuidReg)) {
           const fileContent = await readFile(fileName, { encoding: 'utf-8' })
           const questions = JSON.parse(fileContent)
@@ -36,15 +36,8 @@ const makeQuestionRepository = fileName => {
 
   const addQuestion = async question => {
     try {
-      if (
-        typeof question['author'] === 'string' &&
-        !parseInt(question['author'])
-      ) {
-        if (
-          typeof question === 'string' &&
-          !parseInt(question) &&
-          question.includes('?')
-        ) {
+      if (typeof question['author'] === 'string') {
+        if (typeof question === 'string' && question.includes('?')) {
           const fileContent = await readFile(fileName, { encoding: 'utf-8' })
           const questions = JSON.parse(fileContent)
 
@@ -76,41 +69,87 @@ const makeQuestionRepository = fileName => {
   }
 
   const getAnswers = async questionId => {
-    const fileContent = await readFile(fileName, { encoding: 'utf-8' })
-    const questions = JSON.parse(fileContent)
-    const [question] = questions.filter(question => question.id === questionId)
+    // uuid regex for validation purposes
+    const uuidReg = new RegExp(
+      /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+    )
+    try {
+      if (typeof questionId === 'string') {
+        if (questionId.match(uuidReg)) {
+          const fileContent = await readFile(fileName, { encoding: 'utf-8' })
+          const questions = JSON.parse(fileContent)
+          const [question] = questions.filter(
+            question => question.id === questionId
+          )
 
-    for (prop in question) {
-      if (prop === 'answers') {
-        return question[prop]
+          for (prop in question) {
+            if (prop === 'answers') {
+              return question[prop]
+            }
+          }
+        } else {
+          throw new Error("id doesn't match uuidv4 pattern")
+        }
+      } else {
+        throw new Error('id has to be a string value')
       }
+    } catch (err) {
+      if (err.message.includes('string value'))
+        return { id_is_not_string_value: err.message }
+      return { id_doesnt_match_regex: err.message }
     }
   }
 
   const getAnswer = async (questionId, answerId) => {
-    const fileContent = await readFile(fileName, { encoding: 'utf-8' })
-    const questions = JSON.parse(fileContent)
+    // uuid regex for validation purposes
+    const uuidReg = new RegExp(
+      /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+    )
+    try {
+      if (questionId.match(uuidReg) && typeof questionId === 'string') {
+        if (answerId.match(uuidReg) && typeof answerId === 'string') {
+          const fileContent = await readFile(fileName, { encoding: 'utf-8' })
+          const questions = JSON.parse(fileContent)
 
-    // get question by id
-    const [question] = questions.filter(question => question.id === questionId)
+          // get question by id
+          const [question] = questions.filter(
+            question => question.id === questionId
+          )
 
-    let answer
+          let answer
 
-    // // question object
-    for (prop in question) {
-      // answers property
-      if (prop === 'answers') {
-        // iterate on answers array
-        question[prop].filter(ans => {
-          // iterate on answer object properties
-          for (ansProp in ans) {
-            if (ansProp === 'id' && ans[ansProp] === answerId) {
-              answer = ans
+          // // question object
+          for (prop in question) {
+            // answers property
+            if (prop === 'answers') {
+              // iterate on answers array
+              question[prop].filter(ans => {
+                // iterate on answer object properties
+                for (ansProp in ans) {
+                  if (ansProp === 'id' && ans[ansProp] === answerId) {
+                    answer = ans
+                  }
+                }
+              })
+              return answer
             }
           }
-        })
-        return answer
+        } else {
+          throw new Error(
+            'Provided answer id is invalid. Id has to be string matching uuidv4 pattern'
+          )
+        }
+      } else {
+        throw new Error(
+          'Provided question id is invalid. Id has to be string matching uuidv4 pattern'
+        )
       }
+    } catch (err) {
+      if (err.message.includes('question'))
+        return {
+          invalid_question_id: err.message
+        }
+      return { invalid_answer_id: err.message }
     }
   }
   const addAnswer = async (questionId, answer) => {
