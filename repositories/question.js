@@ -69,7 +69,31 @@ const makeQuestionRepository = fileName => {
     }
     return answer
   }
-  const addAnswer = async (questionId, answer) => {}
+  const addAnswer = async (questionId, answer) => {
+    const fileContent = await readFile(fileName, { encoding: 'utf-8' })
+
+    // all questions
+    const questions = JSON.parse(fileContent)
+
+    // question with specific id
+    const [question] = questions.filter(question => question.id === questionId)
+
+    // iterate on question fields and find answers property
+    for (prop in question) {
+      if (prop === 'answers') {
+        // push answer to answers array property
+        question[prop].push(answer)
+
+        // save in json file new array
+        await writeFile(fileName, JSON.stringify(questions), {
+          encoding: 'utf-8'
+        })
+      }
+    }
+
+    // return new added answer
+    return answer
+  }
 
   return {
     getQuestions,
