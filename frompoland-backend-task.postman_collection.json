@@ -77,7 +77,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"author\":\"5\",\n    \"summary\":\"5\"\n}",
+					"raw": "{\n    \"author\":\"Wojciech Nowakowski\",\n    \"summary\":\"How many stars are in the Milky Way?\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
