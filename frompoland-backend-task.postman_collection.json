@@ -77,7 +77,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"author\":\"Wojciech Nowak\",\n    \"summary\":\"How fast light travel?\"\n}",
+					"raw": "{\n    \"author\":\"5\",\n    \"summary\":\"5\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -164,7 +164,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"author\": \"Michal Kowalski\",\n    \"summary\": \"300000km/s\"\n}",
+					"raw": "{\n    \"author\": \"Dave Novak\",\n    \"summary\": \"some bad person i guess\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -186,7 +186,7 @@
 					"variable": [
 						{
 							"key": "questionId",
-							"value": "a6df8350-d8c0-4fd0-b583-3e6e28ee8971"
+							"value": "{{questionId}}"
 						}
 					]
 				}
@@ -217,12 +217,12 @@
 	"variable": [
 		{
 			"key": "questionId",
-			"value": "a6df8350-d8c0-4fd0-b583-3e6e28ee8971",
+			"value": "00f3dd43-ae53-4430-8da1-b722e034c73d",
 			"type": "string"
 		},
 		{
 			"key": "answerId",
-			"value": "8c35be1c-f3ec-4d75-9f43-8d36056a3f48",
+			"value": "c0595408-4f7f-488e-b136-b27077efd0d0",
 			"type": "string"
 		}
 	]
