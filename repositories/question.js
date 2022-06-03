@@ -24,10 +24,12 @@ const makeQuestionRepository = fileName => {
         const questions = await getDatabase()
 
         // check if question with provided id exist
-        const isValid = questions.some(question => question.id === questionId)
+        const [question] = questions.filter(
+          question => question.id === questionId
+        )
 
         // if so return question
-        if (isValid) {
+        if (question) {
           return questions.filter(question => question.id === questionId)
           // otherwise throw error message
         } else {
@@ -101,13 +103,11 @@ const makeQuestionRepository = fileName => {
       if (questionId.match(uuidReg)) {
         const questions = await getDatabase()
 
-        const isValid = questions.some(question => question.id === questionId)
+        const [question] = questions.filter(
+          question => question.id === questionId
+        )
 
-        if (isValid) {
-          const [question] = questions.filter(
-            question => question.id === questionId
-          )
-
+        if (question) {
           for (prop in question) {
             if (prop === 'answers') {
               return question[prop]
@@ -132,14 +132,12 @@ const makeQuestionRepository = fileName => {
         if (answerId.match(uuidReg)) {
           const questions = await getDatabase()
 
-          const isValid = questions.some(question => question.id === questionId)
+          // get question by id
+          const [question] = questions.filter(
+            question => question.id === questionId
+          )
 
-          if (isValid) {
-            // get question by id
-            const [question] = questions.filter(
-              question => question.id === questionId
-            )
-
+          if (question) {
             let answer
 
             // question object
@@ -198,16 +196,11 @@ const makeQuestionRepository = fileName => {
             // all questions
             const questions = await getDatabase()
 
-            const isValid = questions.some(
+            const [question] = questions.filter(
               question => question.id === questionId
             )
 
-            if (isValid) {
-              // question with specific id
-              const [question] = questions.filter(
-                question => question.id === questionId
-              )
-
+            if (question) {
               // iterate on question fields and find answers property
               for (prop in question) {
                 if (prop === 'answers') {
