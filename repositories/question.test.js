@@ -206,6 +206,7 @@ describe('question repository', () => {
         'Inappropriate question provided. Value has to be string with question mark'
       )
     })
+
     test('when author name datatype is incorrect, return error message', async () => {
       // questions list
       const testQuestions = [
@@ -242,6 +243,7 @@ describe('question repository', () => {
         'Inappropriate author name provided. Name has to be string'
       )
     })
+
     test('when question with provided title already exist, return error message', async () => {
       // questions list
       const testQuestions = [
@@ -319,6 +321,7 @@ describe('question repository', () => {
 
       expect(answers['summary']).toBe(newAnswer.summary)
     })
+
     test("when question with provided id doesn't exist, return error message", async () => {
       // some random uuidv4
       let id = '9f27029e-02da-4df1-b5f2-011c1bec5abd'
@@ -427,6 +430,7 @@ describe('question repository', () => {
 
       expect(singleAnswer['summary']).toBe(firstAnswer.summary)
     })
+
     test("when question id doesn't match uuidv4 regex, return error message", async () => {
       // user id
       let questionId = 'someString'
@@ -475,6 +479,7 @@ describe('question repository', () => {
         'Provided question id is invalid. Id has to match uuidv4 pattern'
       )
     })
+
     test("when answer id doesn't match uuidv4 regex, return error message", async () => {
       // user id
       let questionId = faker.datatype.uuid()
@@ -523,6 +528,7 @@ describe('question repository', () => {
         'Provided answer id is invalid. Id has to match uuidv4 pattern'
       )
     })
+
     test("when question with provided id doesn't exist, return error message", async () => {
       let questionId = '66ce665a-4b22-4d57-9662-7daeeece4e72'
       let answerId = faker.datatype.uuid()
@@ -570,6 +576,7 @@ describe('question repository', () => {
         "question with such id doesn't exist"
       )
     })
+
     test("when answer with provided id doesn't exist, return error message", async () => {
       let questionId = faker.datatype.uuid()
       let answerId = 'fd0f5cc2-fe49-40f6-b1eb-ad9edf32fca9'
@@ -651,6 +658,7 @@ describe('question repository', () => {
         newAnswer.summary
       )
     })
+
     test("when provided id doesn't match uuidv4 regex, return error message", async () => {
       // question id
       let questionId = '123'
@@ -687,6 +695,7 @@ describe('question repository', () => {
         'Incorrect id provided. Id has to be string type and match uuid regex pattern.'
       )
     })
+
     test("when answer's author field datatype is a not string, return error message", async () => {
       // question id
       let questionId = faker.datatype.uuid()
@@ -723,6 +732,7 @@ describe('question repository', () => {
         "Incorrect answer's author provided. Author has to be string type."
       )
     })
+
     test("when answer's title field datatype is a not string, return error message", async () => {
       // question id
       let questionId = faker.datatype.uuid()
@@ -759,6 +769,7 @@ describe('question repository', () => {
         "Incorrect answer's title provided. Title has to be string type."
       )
     })
+
     test("when question with provided id doesn't exist, return error message", async () => {
       // question id
       let questionId = 'acda9bed-d5f0-4a8e-a92c-f44642640dac'
