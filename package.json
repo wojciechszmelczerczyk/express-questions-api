@@ -1,14 +1,18 @@
 {
   "name": "responder",
   "version": "1.0.0",
-  "description": "",
+  "description": "Questions and answers RESTful API",
   "main": "index.js",
   "scripts": {
     "test": "jest",
     "start": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "question",
+    "api",
+    "json"
+  ],
+  "author": "Wojciech Szmelczerczyk <szmelczerczykwojciech@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "@faker-js/faker": "^7.1.0",

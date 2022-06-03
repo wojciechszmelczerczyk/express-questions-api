@@ -1,5 +1,10 @@
 const { readFile, writeFile } = require('fs/promises')
 
+// uuid regex for validation purposes
+const uuidReg = new RegExp(
+  /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+)
+
 const makeQuestionRepository = fileName => {
   const getQuestions = async () => {
     const fileContent = await readFile(fileName, { encoding: 'utf-8' })
@@ -9,11 +14,6 @@ const makeQuestionRepository = fileName => {
   }
 
   const getQuestionById = async questionId => {
-    // uuid regex for validation purposes
-    const uuidReg = new RegExp(
-      /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
-    )
-
     try {
       if (typeof questionId === 'string') {
         if (questionId.match(uuidReg)) {
@@ -35,47 +35,60 @@ const makeQuestionRepository = fileName => {
   }
 
   const addQuestion = async question => {
+    // check if same question exists already
+    const questions = await readFile(fileName, { encoding: 'utf-8' })
+    const parsedQuestions = JSON.parse(questions)
+    const [duplicateQuestion] = parsedQuestions.filter(
+      pQuestion => pQuestion['summary'] === question['summary']
+    )
+
     try {
-      if (typeof question['author'] === 'string') {
+      if (!duplicateQuestion) {
         if (
-          typeof question['summary'] === 'string' &&
-          question['summary'].includes('?')
+          typeof question['author'] === 'string' &&
+          !parseInt(question['author'])
         ) {
-          const fileContent = await readFile(fileName, { encoding: 'utf-8' })
-          const questions = JSON.parse(fileContent)
+          if (
+            typeof question['summary'] === 'string' &&
+            question['summary'].includes('?') &&
+            !parseInt(question['summary'])
+          ) {
+            const fileContent = await readFile(fileName, { encoding: 'utf-8' })
+            const questions = JSON.parse(fileContent)
 
-          // add new question
-          questions.push(question)
+            // add new question
+            questions.push(question)
 
-          // assign modified stringified question array to variable
-          let arr = JSON.stringify(questions)
+            // assign modified stringified question array to variable
+            let arr = JSON.stringify(questions)
 
-          // write new array to file
-          await writeFile(fileName, arr, { encoding: 'utf-8' })
+            // write new array to file
+            await writeFile(fileName, arr, { encoding: 'utf-8' })
 
-          return questions
+            return questions
+          } else {
+            throw new Error(
+              'Inappropriate question provided. Value has to be string with question mark'
+            )
+          }
         } else {
           throw new Error(
-            'Inappropriate question provided. Value has to be string with question mark'
+            'Inappropriate author name provided. Name has to be string'
           )
         }
-      } else {
-        throw new Error(
-          'Inappropriate author name provided. Name has to be string'
-        )
+      } else if (duplicateQuestion) {
+        throw new Error('This question already exists')
       }
     } catch (err) {
-      if (err.message.includes('question'))
+      if (err.message.includes('Inappropriate question'))
         return { invalid_question: err.message }
-      return { invalid_author_name: err.message }
+      else if (err.message.includes('Inappropriate author'))
+        return { invalid_author_name: err.message }
+      return { question_already_exists: err.message }
     }
   }
 
   const getAnswers = async questionId => {
-    // uuid regex for validation purposes
-    const uuidReg = new RegExp(
-      /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
-    )
     try {
       if (typeof questionId === 'string') {
         if (questionId.match(uuidReg)) {
@@ -104,10 +117,6 @@ const makeQuestionRepository = fileName => {
   }
 
   const getAnswer = async (questionId, answerId) => {
-    // uuid regex for validation purposes
-    const uuidReg = new RegExp(
-      /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
-    )
     try {
       if (questionId.match(uuidReg) && typeof questionId === 'string') {
         if (answerId.match(uuidReg) && typeof answerId === 'string') {
@@ -156,11 +165,6 @@ const makeQuestionRepository = fileName => {
     }
   }
   const addAnswer = async (questionId, answer) => {
-    // uuid regex for validation purposes
-    const uuidReg = new RegExp(
-      /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
-    )
-
     try {
       if (typeof questionId === 'string' && questionId.match(uuidReg)) {
         if (
