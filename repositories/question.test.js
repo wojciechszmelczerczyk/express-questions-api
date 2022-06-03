@@ -64,6 +64,7 @@ describe('question repository', () => {
       ]
 
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
       expect(await questionRepo.getQuestionById(id)).toHaveLength(1)
     })
 
@@ -383,6 +384,7 @@ describe('question repository', () => {
       )
     })
   })
+
   describe('GET /questions/:questionId/answers/:answerId', () => {
     test("when question and answer id's are correct return single answer", async () => {
       // user id
@@ -455,7 +457,7 @@ describe('question repository', () => {
       // write questions to file
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      // // new answer objects
+      // new answer objects
       const firstAnswer = {
         id: answerId,
         summary: 'test',
@@ -504,7 +506,7 @@ describe('question repository', () => {
       // write questions to file
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      // // new answer objects
+      // new answer objects
       const firstAnswer = {
         id: answerId,
         summary: 'test',
@@ -552,7 +554,7 @@ describe('question repository', () => {
       // write questions to file
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      // // new answer objects
+      // new answer objects
       const firstAnswer = {
         id: answerId,
         summary: 'test',
@@ -600,7 +602,7 @@ describe('question repository', () => {
       // write questions to file
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      // // new answer objects
+      // new answer objects
       const firstAnswer = {
         id: faker.datatype.uuid(),
         summary: 'test',
@@ -654,6 +656,7 @@ describe('question repository', () => {
         questionId,
         newAnswer
       )
+
       expect(questionWithNewAnswer['answers'][0]['summary']).toBe(
         newAnswer.summary
       )
