@@ -67,13 +67,32 @@ describe('question repository', () => {
       expect(await questionRepo.getQuestionById(id)).toHaveLength(1)
     })
 
-    test('when id is correct but no question is provided', async () => {
-      // user id
-      let id = faker.datatype.uuid()
+    test("when question which such id doesn't exists, return error message", async () => {
+      // some random uuidv4
+      let id = '9f27029e-02da-4df1-b5f2-011c1bec5abd'
 
-      const testQuestions = []
+      const testQuestions = [
+        {
+          id: faker.datatype.uuid(),
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
 
-      expect(await questionRepo.getQuestionById(id)).toHaveLength(0)
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      const errRes = await questionRepo.getQuestionById(id)
+
+      expect(errRes['question_doesnt_exists']).toBe(
+        "question with this id doesn't exists"
+      )
     })
 
     test("when id datatype is string which doesn't match uuidv4 regex return error message", async () => {
@@ -323,23 +342,117 @@ describe('question repository', () => {
       // add new answer
       await questionRepo.addAnswer(id, newAnswer)
 
-      // read modified questions list with brand new added answer and parse to object
-      const questions = JSON.parse(
-        await readFile(TEST_QUESTIONS_FILE_PATH, { encoding: 'utf-8' })
+      // get answers
+      const [answers] = await questionRepo.getAnswers(id)
+
+      expect(answers['summary']).toBe(newAnswer.summary)
+
+      // // read modified questions list with brand new added answer and parse to object
+      // const questions = JSON.parse(
+      //   await readFile(TEST_QUESTIONS_FILE_PATH, { encoding: 'utf-8' })
+      // )
+
+      // // find question with provided id
+      // const [question] = questions.filter(question => question.id === id)
+
+      // // check if answers list is equal to 1 (new added answer),
+      // expect(question['answers'].length).toBe(1)
+
+      // // check if author match provided data
+      // expect(question['answers'][0]['author']).toBe(newAnswer.author)
+    })
+    test("when question with provided id doesn't exists", async () => {
+      // some random uuidv4
+      let id = '9f27029e-02da-4df1-b5f2-011c1bec5abd'
+
+      // sample questions
+      const testQuestions = [
+        {
+          id: faker.datatype.uuid(),
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
+
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      // get error response
+      const errRes = await questionRepo.getAnswers(id)
+
+      expect(errRes['question_doesnt_exists']).toBe(
+        "question with such id doesn't exists"
       )
+    })
 
-      // find question with provided id
-      const [question] = questions.filter(question => question.id === id)
+    test("when id is a string but doesn't match uuidv4 regex", async () => {
+      // user id
+      let id = 'someString'
 
-      // check if answers list is equal to 1 (new added answer),
-      expect(question['answers'].length).toBe(1)
+      // sample questions
+      const testQuestions = [
+        {
+          id,
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
 
-      // check if author match provided data
-      expect(question['answers'][0]['author']).toBe(newAnswer.author)
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      const errRes = await questionRepo.getAnswers(id)
+
+      expect(errRes['id_doesnt_match_regex']).toBe(
+        "id doesn't match uuidv4 pattern"
+      )
+    })
+    test('when id is not a string return err message', async () => {
+      // user id
+      let id = 123
+
+      // sample questions
+      const testQuestions = [
+        {
+          id,
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
+
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      const errRes = await questionRepo.getAnswers(id)
+
+      expect(errRes['id_is_not_string_value']).toBe(
+        'id has to be a string value'
+      )
     })
   })
   describe('GET /questions/:questionId/answers/:answerId', () => {
-    test('should return specific answer', async () => {
+    test("when question and answer id's are correct return single answer", async () => {
       // user id
       let questionId = faker.datatype.uuid()
       let answerId = faker.datatype.uuid()
@@ -380,28 +493,198 @@ describe('question repository', () => {
       await questionRepo.addAnswer(questionId, firstAnswer)
       await questionRepo.addAnswer(questionId, secondAnswer)
 
-      // read modified questions list with brand new added answer and parse to object
-      const questions = JSON.parse(
-        await readFile(TEST_QUESTIONS_FILE_PATH, { encoding: 'utf-8' })
-      )
+      // get single answer
+      const singleAnswer = await questionRepo.getAnswer(questionId, answerId)
 
-      // find question with provided id
-      const [question] = questions.filter(
-        question => question.id === questionId
-      )
+      expect(singleAnswer['summary']).toBe(firstAnswer.summary)
+    })
+    test('when question id datatype is incorrect, return error message', async () => {
+      // user id
+      let questionId = 'someString'
+      let answerId = faker.datatype.uuid()
 
-      // find answer with provided id
-      const [answer] = question['answers'].filter(
-        answer => answer.id === answerId
-      )
+      // sample questions
+      const testQuestions = [
+        {
+          id: questionId,
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
 
-      // expect answer author field match first answer author field
-      expect(answer['author']).toBe(firstAnswer.author)
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      // // new answer objects
+      const firstAnswer = {
+        id: answerId,
+        summary: 'test',
+        author: 'Andrew Dude'
+      }
+
+      const secondAnswer = {
+        id: faker.datatype.uuid(),
+        summary: 'test2',
+        author: 'Michael Bay'
+      }
+
+      // add new answers
+      await questionRepo.addAnswer(questionId, firstAnswer)
+      await questionRepo.addAnswer(questionId, secondAnswer)
+
+      // get single answer
+      const errRes = await questionRepo.getAnswer(questionId, answerId)
+
+      expect(errRes['invalid_question_id_datatype']).toBe(
+        'Provided question id is invalid. Id has to be string matching uuidv4 pattern'
+      )
+    })
+    test('when answer id datatype is incorrect, return error message', async () => {
+      // user id
+      let questionId = faker.datatype.uuid()
+      let answerId = 'someString'
+
+      // sample questions
+      const testQuestions = [
+        {
+          id: questionId,
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
+
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      // // new answer objects
+      const firstAnswer = {
+        id: answerId,
+        summary: 'test',
+        author: 'Andrew Dude'
+      }
+
+      const secondAnswer = {
+        id: faker.datatype.uuid(),
+        summary: 'test2',
+        author: 'Michael Bay'
+      }
+
+      // add new answers
+      await questionRepo.addAnswer(questionId, firstAnswer)
+      await questionRepo.addAnswer(questionId, secondAnswer)
+
+      // get single answer
+      const errRes = await questionRepo.getAnswer(questionId, answerId)
+
+      expect(errRes['invalid_answer_id_datatype']).toBe(
+        'Provided answer id is invalid. Id has to be string matching uuidv4 pattern'
+      )
+    })
+    test("when question with provided id doesn't exists", async () => {
+      let questionId = '66ce665a-4b22-4d57-9662-7daeeece4e72'
+      let answerId = faker.datatype.uuid()
+
+      // sample questions
+      const testQuestions = [
+        {
+          id: faker.datatype.uuid(),
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
+
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      // // new answer objects
+      const firstAnswer = {
+        id: answerId,
+        summary: 'test',
+        author: 'Andrew Dude'
+      }
+
+      const secondAnswer = {
+        id: faker.datatype.uuid(),
+        summary: 'test2',
+        author: 'Michael Bay'
+      }
+
+      // add new answers
+      await questionRepo.addAnswer(questionId, firstAnswer)
+      await questionRepo.addAnswer(questionId, secondAnswer)
+
+      // get single answer
+      const errRes = await questionRepo.getAnswer(questionId, answerId)
+
+      expect(errRes['question_doesnt_exists']).toBe(
+        "question with such id doesn't exists"
+      )
+    })
+    test("when answer with provided id doesn't exists", async () => {
+      let questionId = faker.datatype.uuid()
+      let answerId = 'fd0f5cc2-fe49-40f6-b1eb-ad9edf32fca9'
+
+      // sample questions
+      const testQuestions = [
+        {
+          id: questionId,
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
+
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      // // new answer objects
+      const firstAnswer = {
+        id: faker.datatype.uuid(),
+        summary: 'test',
+        author: 'Andrew Dude'
+      }
+
+      // add new answer
+      await questionRepo.addAnswer(questionId, firstAnswer)
+
+      // get single answer
+      const errRes = await questionRepo.getAnswer(questionId, answerId)
+
+      expect(errRes['answer_doesnt_exists']).toBe(
+        "answer with such id doesn't exists"
+      )
     })
   })
 
   describe('POST /questions/:questionId/answers', () => {
-    test('should add new answer', async () => {
+    test('when question id and answer are correct, return question with new answer', async () => {
       // question id
       let questionId = faker.datatype.uuid()
 
@@ -431,38 +714,157 @@ describe('question repository', () => {
       // write questions to file
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      // read file with base questions
-      const questions = JSON.parse(
-        await readFile(TEST_QUESTIONS_FILE_PATH, { encoding: 'utf-8' })
+      const questionWithNewAnswer = await questionRepo.addAnswer(
+        questionId,
+        newAnswer
       )
-
-      // get question by provided id
-      const [question] = questions.filter(
-        question => question.id === questionId
+      expect(questionWithNewAnswer['answers'][0]['summary']).toBe(
+        newAnswer.summary
       )
+    })
+    test('when provided id datatype is not string matching uuidv4 regex, return error message', async () => {
+      // question id
+      let questionId = '123'
 
-      // save answers list length (0)
-      const answersListLength = question['answers'].length
+      // sample questions
+      const testQuestions = [
+        {
+          id: questionId,
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
 
-      // add new answer
-      await questionRepo.addAnswer(questionId, newAnswer)
+      // new answer object
+      const newAnswer = {
+        id: faker.datatype.uuid(),
+        summary: 'test',
+        author: 'Andrew Dude'
+      }
 
-      // read modified list
-      const modifiedQuestions = JSON.parse(
-        await readFile(TEST_QUESTIONS_FILE_PATH, { encoding: 'utf-8' })
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      const errRes = await questionRepo.addAnswer(questionId, newAnswer)
+
+      expect(errRes['incorrect_id_provided']).toBe(
+        'Incorrect id provided. Id has to be string type and match uuid regex pattern.'
       )
+    })
+    test("when answer's author datatype is a not string, return error message", async () => {
+      // question id
+      let questionId = faker.datatype.uuid()
 
-      // get question by id
-      const [question2] = modifiedQuestions.filter(
-        question => question.id === questionId
+      // sample questions
+      const testQuestions = [
+        {
+          id: questionId,
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
+
+      // new answer object
+      const newAnswer = {
+        id: faker.datatype.uuid(),
+        summary: 'test',
+        author: 123
+      }
+
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      const errRes = await questionRepo.addAnswer(questionId, newAnswer)
+
+      expect(errRes['incorrect_answer_author']).toBe(
+        "Incorrect answer's author provided. Author has to be string type."
       )
+    })
+    test("when answer's title datatype is a not string, return error message", async () => {
+      // question id
+      let questionId = faker.datatype.uuid()
 
-      // now answers list of question is equal to 1 (new question added)
-      const modifiedAnswersListLength = question2['answers'].length
+      // sample questions
+      const testQuestions = [
+        {
+          id: questionId,
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
 
-      // after answer addition expect new answers list
-      // to be greater than one before addition
-      expect(modifiedAnswersListLength).toBeGreaterThan(answersListLength)
+      // new answer object
+      const newAnswer = {
+        id: faker.datatype.uuid(),
+        summary: 123,
+        author: 'John Nash'
+      }
+
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      const errRes = await questionRepo.addAnswer(questionId, newAnswer)
+
+      expect(errRes['incorrect_answer_title']).toBe(
+        "Incorrect answer's title provided. Title has to be string type."
+      )
+    })
+    test("when question with provided id doesn't exists, return error message", async () => {
+      // question id
+      let questionId = 'acda9bed-d5f0-4a8e-a92c-f44642640dac'
+
+      // sample questions
+      const testQuestions = [
+        {
+          id: faker.datatype.uuid(),
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: []
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
+
+      // new answer object
+      const newAnswer = {
+        id: faker.datatype.uuid(),
+        summary: 'How fast are leopards running?',
+        author: 'John Nash'
+      }
+
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      const errRes = await questionRepo.addAnswer(questionId, newAnswer)
+
+      expect(errRes['question_doesnt_exists']).toBe(
+        "Question with provided id doesn't exists."
+      )
     })
   })
 })

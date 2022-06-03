@@ -20,7 +20,16 @@ const makeQuestionRepository = fileName => {
           const fileContent = await readFile(fileName, { encoding: 'utf-8' })
           const questions = JSON.parse(fileContent)
 
-          return questions.filter(question => question.id === questionId)
+          // check if question with provided id exists
+          const isValid = questions.some(question => question.id === questionId)
+
+          // if so return question
+          if (isValid) {
+            return questions.filter(question => question.id === questionId)
+            // otherwise throw error message
+          } else {
+            throw new Error("question with this id doesn't exists")
+          }
         } else {
           throw new Error("id doesn't match uuidv4 pattern")
         }
@@ -30,6 +39,8 @@ const makeQuestionRepository = fileName => {
     } catch (err) {
       if (err.message.includes('string value'))
         return { id_is_not_string_value: err.message }
+      else if (err.message.includes("doesn't exists"))
+        return { question_doesnt_exists: err.message }
       return { id_doesnt_match_regex: err.message }
     }
   }
@@ -94,14 +105,21 @@ const makeQuestionRepository = fileName => {
         if (questionId.match(uuidReg)) {
           const fileContent = await readFile(fileName, { encoding: 'utf-8' })
           const questions = JSON.parse(fileContent)
-          const [question] = questions.filter(
-            question => question.id === questionId
-          )
 
-          for (prop in question) {
-            if (prop === 'answers') {
-              return question[prop]
+          const isValid = questions.some(question => question.id === questionId)
+
+          if (isValid) {
+            const [question] = questions.filter(
+              question => question.id === questionId
+            )
+
+            for (prop in question) {
+              if (prop === 'answers') {
+                return question[prop]
+              }
             }
+          } else {
+            throw new Error("question with such id doesn't exists")
           }
         } else {
           throw new Error("id doesn't match uuidv4 pattern")
@@ -112,7 +130,9 @@ const makeQuestionRepository = fileName => {
     } catch (err) {
       if (err.message.includes('string value'))
         return { id_is_not_string_value: err.message }
-      return { id_doesnt_match_regex: err.message }
+      else if (err.message.includes('uuidv4'))
+        return { id_doesnt_match_regex: err.message }
+      return { question_doesnt_exists: err.message }
     }
   }
 
@@ -123,28 +143,35 @@ const makeQuestionRepository = fileName => {
           const fileContent = await readFile(fileName, { encoding: 'utf-8' })
           const questions = JSON.parse(fileContent)
 
-          // get question by id
-          const [question] = questions.filter(
-            question => question.id === questionId
-          )
+          const isValid = questions.some(question => question.id === questionId)
 
-          let answer
+          if (isValid) {
+            // get question by id
+            const [question] = questions.filter(
+              question => question.id === questionId
+            )
 
-          // // question object
-          for (prop in question) {
-            // answers property
-            if (prop === 'answers') {
-              // iterate on answers array
-              question[prop].filter(ans => {
-                // iterate on answer object properties
-                for (ansProp in ans) {
-                  if (ansProp === 'id' && ans[ansProp] === answerId) {
-                    answer = ans
+            let answer
+
+            // question object
+            for (prop in question) {
+              // answers property
+              if (prop === 'answers') {
+                // iterate on answers array
+                question[prop].forEach(ans => {
+                  // iterate on answer object properties
+                  for (ansProp in ans) {
+                    if (ansProp === 'id') {
+                      if (ans[ansProp] === answerId) answer = ans
+                    }
                   }
-                }
-              })
-              return answer
+                })
+                if (answer) return answer
+                else throw new Error("answer with such id doesn't exists")
+              }
             }
+          } else {
+            throw new Error("question with such id doesn't exists")
           }
         } else {
           throw new Error(
@@ -157,11 +184,15 @@ const makeQuestionRepository = fileName => {
         )
       }
     } catch (err) {
-      if (err.message.includes('question'))
+      if (err.message.includes('Provided question'))
         return {
-          invalid_question_id: err.message
+          invalid_question_id_datatype: err.message
         }
-      return { invalid_answer_id: err.message }
+      else if (err.message.includes('Provided answer'))
+        return { invalid_answer_id_datatype: err.message }
+      else if (err.message.includes("question with such id doesn't exists"))
+        return { question_doesnt_exists: err.message }
+      return { answer_doesnt_exists: err.message }
     }
   }
   const addAnswer = async (questionId, answer) => {
@@ -180,26 +211,34 @@ const makeQuestionRepository = fileName => {
             // all questions
             const questions = JSON.parse(fileContent)
 
-            // question with specific id
-            const [question] = questions.filter(
+            const isValid = questions.some(
               question => question.id === questionId
             )
 
-            // iterate on question fields and find answers property
-            for (prop in question) {
-              if (prop === 'answers') {
-                // push answer to answers array property
-                question[prop].push(answer)
+            if (isValid) {
+              // question with specific id
+              const [question] = questions.filter(
+                question => question.id === questionId
+              )
 
-                // save in json file new array
-                await writeFile(fileName, JSON.stringify(questions), {
-                  encoding: 'utf-8'
-                })
+              // iterate on question fields and find answers property
+              for (prop in question) {
+                if (prop === 'answers') {
+                  // push answer to answers array property
+                  question[prop].push(answer)
+
+                  // save in json file new array
+                  await writeFile(fileName, JSON.stringify(questions), {
+                    encoding: 'utf-8'
+                  })
+                }
               }
-            }
 
-            // return new added answer
-            return answer
+              // return question object with new answer
+              return question
+            } else {
+              throw new Error("Question with provided id doesn't exists.")
+            }
           } else {
             throw new Error(
               "Incorrect answer's title provided. Title has to be string type."
@@ -220,9 +259,11 @@ const makeQuestionRepository = fileName => {
         return { incorrect_answer_title: err.message }
       else if (err.message.includes('author'))
         return { incorrect_answer_author: err.message }
-      return {
-        incorrect_id_provided: err.message
-      }
+      else if (err.message.includes('Incorrect id provided'))
+        return {
+          incorrect_id_provided: err.message
+        }
+      return { question_doesnt_exists: err.message }
     }
   }
 
