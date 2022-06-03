@@ -44,7 +44,7 @@ describe('question repository', () => {
   })
 
   describe('GET /questions/:id', () => {
-    test('when id datatype is correct return question by specific id', async () => {
+    test('when id match uuidv4 regex, return question by specific id', async () => {
       // user id
       let id = faker.datatype.uuid()
 
@@ -67,7 +67,7 @@ describe('question repository', () => {
       expect(await questionRepo.getQuestionById(id)).toHaveLength(1)
     })
 
-    test("when question which such id doesn't exists, return error message", async () => {
+    test("when question with such id doesn't exist, return error message", async () => {
       // some random uuidv4
       let id = '9f27029e-02da-4df1-b5f2-011c1bec5abd'
 
@@ -90,8 +90,8 @@ describe('question repository', () => {
 
       const errRes = await questionRepo.getQuestionById(id)
 
-      expect(errRes['question_doesnt_exists']).toBe(
-        "question with this id doesn't exists"
+      expect(errRes['question_doesnt_exist']).toBe(
+        "question with this id doesn't exist"
       )
     })
 
@@ -242,7 +242,7 @@ describe('question repository', () => {
         'Inappropriate author name provided. Name has to be string'
       )
     })
-    test('when question with provided title already exists, return error message', async () => {
+    test('when question with provided title already exist, return error message', async () => {
       // questions list
       const testQuestions = [
         {
@@ -273,15 +273,15 @@ describe('question repository', () => {
       // return error message
       const resErr = await questionRepo.addQuestion(duplicateQuestion)
 
-      // expect error message, new question has not been added due to summary field incorrect datatype
-      expect(resErr['question_already_exists']).toBe(
-        'This question already exists'
+      // expect error message, new question has not been added due to question duplicate
+      expect(resErr['question_already_exist']).toBe(
+        'This question already exist'
       )
     })
   })
 
   describe('GET /questions/:questionId/answers', () => {
-    test('when id datatype is correct and match uuid regex return answers of specific question', async () => {
+    test('when id match uuid regex return answers of specific question', async () => {
       // user id
       let id = faker.datatype.uuid()
 
@@ -319,7 +319,7 @@ describe('question repository', () => {
 
       expect(answers['summary']).toBe(newAnswer.summary)
     })
-    test("when question with provided id doesn't exists", async () => {
+    test("when question with provided id doesn't exist, return error message", async () => {
       // some random uuidv4
       let id = '9f27029e-02da-4df1-b5f2-011c1bec5abd'
 
@@ -345,8 +345,8 @@ describe('question repository', () => {
       // get error response
       const errRes = await questionRepo.getAnswers(id)
 
-      expect(errRes['question_doesnt_exists']).toBe(
-        "question with such id doesn't exists"
+      expect(errRes['question_doesnt_exist']).toBe(
+        "question with such id doesn't exist"
       )
     })
 
@@ -475,7 +475,7 @@ describe('question repository', () => {
         'Provided question id is invalid. Id has to match uuidv4 pattern'
       )
     })
-    test("when answer id doesn't match uuidv4 pattern, return error message", async () => {
+    test("when answer id doesn't match uuidv4 regex, return error message", async () => {
       // user id
       let questionId = faker.datatype.uuid()
       let answerId = 'someString'
@@ -523,7 +523,7 @@ describe('question repository', () => {
         'Provided answer id is invalid. Id has to match uuidv4 pattern'
       )
     })
-    test("when question with provided id doesn't exists", async () => {
+    test("when question with provided id doesn't exist, return error message", async () => {
       let questionId = '66ce665a-4b22-4d57-9662-7daeeece4e72'
       let answerId = faker.datatype.uuid()
 
@@ -566,11 +566,11 @@ describe('question repository', () => {
       // get single answer
       const errRes = await questionRepo.getAnswer(questionId, answerId)
 
-      expect(errRes['question_doesnt_exists']).toBe(
-        "question with such id doesn't exists"
+      expect(errRes['question_doesnt_exist']).toBe(
+        "question with such id doesn't exist"
       )
     })
-    test("when answer with provided id doesn't exists", async () => {
+    test("when answer with provided id doesn't exist, return error message", async () => {
       let questionId = faker.datatype.uuid()
       let answerId = 'fd0f5cc2-fe49-40f6-b1eb-ad9edf32fca9'
 
@@ -606,8 +606,8 @@ describe('question repository', () => {
       // get single answer
       const errRes = await questionRepo.getAnswer(questionId, answerId)
 
-      expect(errRes['answer_doesnt_exists']).toBe(
-        "answer with such id doesn't exists"
+      expect(errRes['answer_doesnt_exist']).toBe(
+        "answer with such id doesn't exist"
       )
     })
   })
@@ -687,7 +687,7 @@ describe('question repository', () => {
         'Incorrect id provided. Id has to be string type and match uuid regex pattern.'
       )
     })
-    test("when answer's author datatype is a not string, return error message", async () => {
+    test("when answer's author field datatype is a not string, return error message", async () => {
       // question id
       let questionId = faker.datatype.uuid()
 
@@ -723,7 +723,7 @@ describe('question repository', () => {
         "Incorrect answer's author provided. Author has to be string type."
       )
     })
-    test("when answer's title datatype is a not string, return error message", async () => {
+    test("when answer's title field datatype is a not string, return error message", async () => {
       // question id
       let questionId = faker.datatype.uuid()
 
@@ -759,7 +759,7 @@ describe('question repository', () => {
         "Incorrect answer's title provided. Title has to be string type."
       )
     })
-    test("when question with provided id doesn't exists, return error message", async () => {
+    test("when question with provided id doesn't exist, return error message", async () => {
       // question id
       let questionId = 'acda9bed-d5f0-4a8e-a92c-f44642640dac'
 
@@ -791,8 +791,8 @@ describe('question repository', () => {
 
       const errRes = await questionRepo.addAnswer(questionId, newAnswer)
 
-      expect(errRes['question_doesnt_exists']).toBe(
-        "Question with provided id doesn't exists."
+      expect(errRes['question_doesnt_exist']).toBe(
+        "Question with provided id doesn't exist."
       )
     })
   })

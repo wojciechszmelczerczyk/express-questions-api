@@ -6,6 +6,7 @@ const uuidReg = new RegExp(
 )
 
 const makeQuestionRepository = fileName => {
+  // read json database and parse to object
   const getDatabase = async () => {
     const fileContent = await readFile(fileName, { encoding: 'utf-8' })
     return JSON.parse(fileContent)
@@ -22,7 +23,7 @@ const makeQuestionRepository = fileName => {
       if (questionId.match(uuidReg)) {
         const questions = await getDatabase()
 
-        // check if question with provided id exists
+        // check if question with provided id exist
         const isValid = questions.some(question => question.id === questionId)
 
         // if so return question
@@ -30,20 +31,20 @@ const makeQuestionRepository = fileName => {
           return questions.filter(question => question.id === questionId)
           // otherwise throw error message
         } else {
-          throw new Error("question with this id doesn't exists")
+          throw new Error("question with this id doesn't exist")
         }
       } else {
         throw new Error("id doesn't match uuidv4 pattern")
       }
     } catch (err) {
-      if (err.message.includes("doesn't exists"))
-        return { question_doesnt_exists: err.message }
+      if (err.message.includes("doesn't exist"))
+        return { question_doesnt_exist: err.message }
       return { id_doesnt_match_regex: err.message }
     }
   }
 
   const addQuestion = async question => {
-    // check if same question exists already
+    // check if same question exist already
     const questions = await readFile(fileName, { encoding: 'utf-8' })
     const parsedQuestions = JSON.parse(questions)
     const [duplicateQuestion] = parsedQuestions.filter(
@@ -84,14 +85,14 @@ const makeQuestionRepository = fileName => {
           )
         }
       } else if (duplicateQuestion) {
-        throw new Error('This question already exists')
+        throw new Error('This question already exist')
       }
     } catch (err) {
       if (err.message.includes('Inappropriate question'))
         return { invalid_question: err.message }
       else if (err.message.includes('Inappropriate author'))
         return { invalid_author_name: err.message }
-      return { question_already_exists: err.message }
+      return { question_already_exist: err.message }
     }
   }
 
@@ -113,7 +114,7 @@ const makeQuestionRepository = fileName => {
             }
           }
         } else {
-          throw new Error("question with such id doesn't exists")
+          throw new Error("question with such id doesn't exist")
         }
       } else {
         throw new Error("id doesn't match uuidv4 pattern")
@@ -121,7 +122,7 @@ const makeQuestionRepository = fileName => {
     } catch (err) {
       if (err.message.includes('uuidv4'))
         return { id_doesnt_match_regex: err.message }
-      return { question_doesnt_exists: err.message }
+      return { question_doesnt_exist: err.message }
     }
   }
 
@@ -155,11 +156,11 @@ const makeQuestionRepository = fileName => {
                   }
                 })
                 if (answer) return answer
-                else throw new Error("answer with such id doesn't exists")
+                else throw new Error("answer with such id doesn't exist")
               }
             }
           } else {
-            throw new Error("question with such id doesn't exists")
+            throw new Error("question with such id doesn't exist")
           }
         } else {
           throw new Error(
@@ -178,9 +179,9 @@ const makeQuestionRepository = fileName => {
         }
       else if (err.message.includes('Provided answer'))
         return { invalid_answer_id_datatype: err.message }
-      else if (err.message.includes("question with such id doesn't exists"))
-        return { question_doesnt_exists: err.message }
-      return { answer_doesnt_exists: err.message }
+      else if (err.message.includes("question with such id doesn't exist"))
+        return { question_doesnt_exist: err.message }
+      return { answer_doesnt_exist: err.message }
     }
   }
   const addAnswer = async (questionId, answer) => {
@@ -223,7 +224,7 @@ const makeQuestionRepository = fileName => {
               // return question object with new answer
               return question
             } else {
-              throw new Error("Question with provided id doesn't exists.")
+              throw new Error("Question with provided id doesn't exist.")
             }
           } else {
             throw new Error(
@@ -249,7 +250,7 @@ const makeQuestionRepository = fileName => {
         return {
           incorrect_id_provided: err.message
         }
-      return { question_doesnt_exists: err.message }
+      return { question_doesnt_exist: err.message }
     }
   }
 
