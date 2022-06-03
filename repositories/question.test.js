@@ -346,20 +346,6 @@ describe('question repository', () => {
       const [answers] = await questionRepo.getAnswers(id)
 
       expect(answers['summary']).toBe(newAnswer.summary)
-
-      // // read modified questions list with brand new added answer and parse to object
-      // const questions = JSON.parse(
-      //   await readFile(TEST_QUESTIONS_FILE_PATH, { encoding: 'utf-8' })
-      // )
-
-      // // find question with provided id
-      // const [question] = questions.filter(question => question.id === id)
-
-      // // check if answers list is equal to 1 (new added answer),
-      // expect(question['answers'].length).toBe(1)
-
-      // // check if author match provided data
-      // expect(question['answers'][0]['author']).toBe(newAnswer.author)
     })
     test("when question with provided id doesn't exists", async () => {
       // some random uuidv4
