@@ -227,10 +227,10 @@ describe('question repository', () => {
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
       // return error message
-      const res_err = await questionRepo.addQuestion(newQuestion)
+      const resErr = await questionRepo.addQuestion(newQuestion)
 
       // expect error message, new question has not been added due to summary field incorrect datatype
-      expect(res_err['invalid_question']).toBe(
+      expect(resErr['invalid_question']).toBe(
         'Inappropriate question provided. Value has to be string with question mark'
       )
     })

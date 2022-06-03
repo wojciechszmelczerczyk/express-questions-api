@@ -6,9 +6,13 @@ const uuidReg = new RegExp(
 )
 
 const makeQuestionRepository = fileName => {
-  const getQuestions = async () => {
+  const getDatabase = async () => {
     const fileContent = await readFile(fileName, { encoding: 'utf-8' })
-    const questions = JSON.parse(fileContent)
+    return JSON.parse(fileContent)
+  }
+
+  const getQuestions = async () => {
+    const questions = await getDatabase()
 
     return questions
   }
@@ -17,8 +21,7 @@ const makeQuestionRepository = fileName => {
     try {
       if (typeof questionId === 'string') {
         if (questionId.match(uuidReg)) {
-          const fileContent = await readFile(fileName, { encoding: 'utf-8' })
-          const questions = JSON.parse(fileContent)
+          const questions = await getDatabase()
 
           // check if question with provided id exists
           const isValid = questions.some(question => question.id === questionId)
@@ -64,8 +67,7 @@ const makeQuestionRepository = fileName => {
             question['summary'].includes('?') &&
             !parseInt(question['summary'])
           ) {
-            const fileContent = await readFile(fileName, { encoding: 'utf-8' })
-            const questions = JSON.parse(fileContent)
+            const questions = await getDatabase()
 
             // add new question
             questions.push(question)
@@ -103,8 +105,7 @@ const makeQuestionRepository = fileName => {
     try {
       if (typeof questionId === 'string') {
         if (questionId.match(uuidReg)) {
-          const fileContent = await readFile(fileName, { encoding: 'utf-8' })
-          const questions = JSON.parse(fileContent)
+          const questions = await getDatabase()
 
           const isValid = questions.some(question => question.id === questionId)
 
@@ -140,8 +141,7 @@ const makeQuestionRepository = fileName => {
     try {
       if (questionId.match(uuidReg) && typeof questionId === 'string') {
         if (answerId.match(uuidReg) && typeof answerId === 'string') {
-          const fileContent = await readFile(fileName, { encoding: 'utf-8' })
-          const questions = JSON.parse(fileContent)
+          const questions = await getDatabase()
 
           const isValid = questions.some(question => question.id === questionId)
 
@@ -206,10 +206,8 @@ const makeQuestionRepository = fileName => {
             typeof answer['summary'] === 'string' &&
             !parseInt(answer['summary'])
           ) {
-            const fileContent = await readFile(fileName, { encoding: 'utf-8' })
-
             // all questions
-            const questions = JSON.parse(fileContent)
+            const questions = await getDatabase()
 
             const isValid = questions.some(
               question => question.id === questionId
