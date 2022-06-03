@@ -19,30 +19,24 @@ const makeQuestionRepository = fileName => {
 
   const getQuestionById = async questionId => {
     try {
-      if (typeof questionId === 'string') {
-        if (questionId.match(uuidReg)) {
-          const questions = await getDatabase()
+      if (questionId.match(uuidReg)) {
+        const questions = await getDatabase()
 
-          // check if question with provided id exists
-          const isValid = questions.some(question => question.id === questionId)
+        // check if question with provided id exists
+        const isValid = questions.some(question => question.id === questionId)
 
-          // if so return question
-          if (isValid) {
-            return questions.filter(question => question.id === questionId)
-            // otherwise throw error message
-          } else {
-            throw new Error("question with this id doesn't exists")
-          }
+        // if so return question
+        if (isValid) {
+          return questions.filter(question => question.id === questionId)
+          // otherwise throw error message
         } else {
-          throw new Error("id doesn't match uuidv4 pattern")
+          throw new Error("question with this id doesn't exists")
         }
       } else {
-        throw new Error('id has to be a string value')
+        throw new Error("id doesn't match uuidv4 pattern")
       }
     } catch (err) {
-      if (err.message.includes('string value'))
-        return { id_is_not_string_value: err.message }
-      else if (err.message.includes("doesn't exists"))
+      if (err.message.includes("doesn't exists"))
         return { question_doesnt_exists: err.message }
       return { id_doesnt_match_regex: err.message }
     }
@@ -103,35 +97,29 @@ const makeQuestionRepository = fileName => {
 
   const getAnswers = async questionId => {
     try {
-      if (typeof questionId === 'string') {
-        if (questionId.match(uuidReg)) {
-          const questions = await getDatabase()
+      if (questionId.match(uuidReg)) {
+        const questions = await getDatabase()
 
-          const isValid = questions.some(question => question.id === questionId)
+        const isValid = questions.some(question => question.id === questionId)
 
-          if (isValid) {
-            const [question] = questions.filter(
-              question => question.id === questionId
-            )
+        if (isValid) {
+          const [question] = questions.filter(
+            question => question.id === questionId
+          )
 
-            for (prop in question) {
-              if (prop === 'answers') {
-                return question[prop]
-              }
+          for (prop in question) {
+            if (prop === 'answers') {
+              return question[prop]
             }
-          } else {
-            throw new Error("question with such id doesn't exists")
           }
         } else {
-          throw new Error("id doesn't match uuidv4 pattern")
+          throw new Error("question with such id doesn't exists")
         }
       } else {
-        throw new Error('id has to be a string value')
+        throw new Error("id doesn't match uuidv4 pattern")
       }
     } catch (err) {
-      if (err.message.includes('string value'))
-        return { id_is_not_string_value: err.message }
-      else if (err.message.includes('uuidv4'))
+      if (err.message.includes('uuidv4'))
         return { id_doesnt_match_regex: err.message }
       return { question_doesnt_exists: err.message }
     }
@@ -139,8 +127,8 @@ const makeQuestionRepository = fileName => {
 
   const getAnswer = async (questionId, answerId) => {
     try {
-      if (questionId.match(uuidReg) && typeof questionId === 'string') {
-        if (answerId.match(uuidReg) && typeof answerId === 'string') {
+      if (questionId.match(uuidReg)) {
+        if (answerId.match(uuidReg)) {
           const questions = await getDatabase()
 
           const isValid = questions.some(question => question.id === questionId)
@@ -175,12 +163,12 @@ const makeQuestionRepository = fileName => {
           }
         } else {
           throw new Error(
-            'Provided answer id is invalid. Id has to be string matching uuidv4 pattern'
+            'Provided answer id is invalid. Id has to match uuidv4 pattern'
           )
         }
       } else {
         throw new Error(
-          'Provided question id is invalid. Id has to be string matching uuidv4 pattern'
+          'Provided question id is invalid. Id has to match uuidv4 pattern'
         )
       }
     } catch (err) {
@@ -197,7 +185,7 @@ const makeQuestionRepository = fileName => {
   }
   const addAnswer = async (questionId, answer) => {
     try {
-      if (typeof questionId === 'string' && questionId.match(uuidReg)) {
+      if (questionId.match(uuidReg)) {
         if (
           typeof answer['author'] === 'string' &&
           !parseInt(answer['author'])

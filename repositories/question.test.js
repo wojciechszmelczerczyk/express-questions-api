@@ -95,7 +95,7 @@ describe('question repository', () => {
       )
     })
 
-    test("when id datatype is string which doesn't match uuidv4 regex return error message", async () => {
+    test("when id doesn't match uuidv4 regex, return error message", async () => {
       // incorrect user id sample
       let id = '123'
 
@@ -120,34 +120,6 @@ describe('question repository', () => {
 
       expect(errRes['id_doesnt_match_regex']).toBe(
         "id doesn't match uuidv4 pattern"
-      )
-    })
-    // verify if fields are correct
-    test('when id is not string return error message', async () => {
-      // incorrect user id sample
-      let id = 123
-
-      const testQuestions = [
-        {
-          id,
-          summary: 'What is my name?',
-          author: 'Jack London',
-          answers: []
-        },
-        {
-          id: faker.datatype.uuid(),
-          summary: 'Who are you?',
-          author: 'Tim Doods',
-          answers: []
-        }
-      ]
-
-      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
-
-      const errRes = await questionRepo.getQuestionById(id)
-
-      expect(errRes['id_is_not_string_value']).toBe(
-        'id has to be a string value'
       )
     })
   })
@@ -198,7 +170,7 @@ describe('question repository', () => {
       expect(listWithNewQuestion.length).toBe(questionsListLength + 1)
     })
 
-    test('when question datatype is incorrect return error message', async () => {
+    test('when question datatype is incorrect, return error message', async () => {
       // questions list
       const testQuestions = [
         {
@@ -234,7 +206,7 @@ describe('question repository', () => {
         'Inappropriate question provided. Value has to be string with question mark'
       )
     })
-    test('when author name datatype is incorrect return error message', async () => {
+    test('when author name datatype is incorrect, return error message', async () => {
       // questions list
       const testQuestions = [
         {
@@ -270,7 +242,7 @@ describe('question repository', () => {
         'Inappropriate author name provided. Name has to be string'
       )
     })
-    test('when question with provided title already exists return error message', async () => {
+    test('when question with provided title already exists, return error message', async () => {
       // questions list
       const testQuestions = [
         {
@@ -378,7 +350,7 @@ describe('question repository', () => {
       )
     })
 
-    test("when id is a string but doesn't match uuidv4 regex", async () => {
+    test("when id doesn't match uuidv4 regex", async () => {
       // user id
       let id = 'someString'
 
@@ -405,35 +377,6 @@ describe('question repository', () => {
 
       expect(errRes['id_doesnt_match_regex']).toBe(
         "id doesn't match uuidv4 pattern"
-      )
-    })
-    test('when id is not a string return err message', async () => {
-      // user id
-      let id = 123
-
-      // sample questions
-      const testQuestions = [
-        {
-          id,
-          summary: 'What is my name?',
-          author: 'Jack London',
-          answers: []
-        },
-        {
-          id: faker.datatype.uuid(),
-          summary: 'Who are you?',
-          author: 'Tim Doods',
-          answers: []
-        }
-      ]
-
-      // write questions to file
-      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
-
-      const errRes = await questionRepo.getAnswers(id)
-
-      expect(errRes['id_is_not_string_value']).toBe(
-        'id has to be a string value'
       )
     })
   })
@@ -484,7 +427,7 @@ describe('question repository', () => {
 
       expect(singleAnswer['summary']).toBe(firstAnswer.summary)
     })
-    test('when question id datatype is incorrect, return error message', async () => {
+    test("when question id doesn't match uuidv4 regex, return error message", async () => {
       // user id
       let questionId = 'someString'
       let answerId = faker.datatype.uuid()
@@ -529,10 +472,10 @@ describe('question repository', () => {
       const errRes = await questionRepo.getAnswer(questionId, answerId)
 
       expect(errRes['invalid_question_id_datatype']).toBe(
-        'Provided question id is invalid. Id has to be string matching uuidv4 pattern'
+        'Provided question id is invalid. Id has to match uuidv4 pattern'
       )
     })
-    test('when answer id datatype is incorrect, return error message', async () => {
+    test("when answer id doesn't match uuidv4 pattern, return error message", async () => {
       // user id
       let questionId = faker.datatype.uuid()
       let answerId = 'someString'
@@ -577,7 +520,7 @@ describe('question repository', () => {
       const errRes = await questionRepo.getAnswer(questionId, answerId)
 
       expect(errRes['invalid_answer_id_datatype']).toBe(
-        'Provided answer id is invalid. Id has to be string matching uuidv4 pattern'
+        'Provided answer id is invalid. Id has to match uuidv4 pattern'
       )
     })
     test("when question with provided id doesn't exists", async () => {
@@ -708,7 +651,7 @@ describe('question repository', () => {
         newAnswer.summary
       )
     })
-    test('when provided id datatype is not string matching uuidv4 regex, return error message', async () => {
+    test("when provided id doesn't match uuidv4 regex, return error message", async () => {
       // question id
       let questionId = '123'
 
