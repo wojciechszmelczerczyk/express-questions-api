@@ -657,7 +657,7 @@ describe('question repository', () => {
       // new answer object
       const newAnswer = {
         id: faker.datatype.uuid(),
-        summary: 'How fast are leopards running?',
+        summary: 'some dummy answer',
         author: 'John Nash'
       }
 
@@ -667,6 +667,49 @@ describe('question repository', () => {
       const res = await questionRepo.addAnswer(questionId, newAnswer)
 
       expect(res['err']).toBe("question with this id doesn't exist")
+    })
+
+    test('when user submit answer for same question more than once, return error', async () => {
+      // question id
+      let questionId = faker.datatype.uuid()
+
+      // sample questions
+      const testQuestions = [
+        {
+          id: questionId,
+          summary: 'What is my name?',
+          author: 'Jack London',
+          answers: [
+            {
+              id: faker.datatype.uuid(),
+              summary: 'George!',
+              author: 'John Nash'
+            }
+          ]
+        },
+        {
+          id: faker.datatype.uuid(),
+          summary: 'Who are you?',
+          author: 'Tim Doods',
+          answers: []
+        }
+      ]
+
+      // answer submitted from same author
+      const duplicateAnswer = {
+        id: faker.datatype.uuid(),
+        summary: 'Brat, probably',
+        author: 'John Nash'
+      }
+
+      // write questions to file
+      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+      const res = await questionRepo.addAnswer(questionId, duplicateAnswer)
+
+      expect(res['err']).toBe(
+        'User cannot answer the same question more than once'
+      )
     })
   })
 })

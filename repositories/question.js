@@ -165,13 +165,22 @@ const makeQuestionRepository = fileName => {
           )
         }
 
-        answers.push(answer)
+        // check if user already answered the question
+        const duplicateAnswer = answers.find(a => a.author === author)
 
-        await writeFile(fileName, JSON.stringify(questions), {
-          encoding: 'utf-8'
-        })
+        // if not, proceed
+        if (duplicateAnswer === undefined) {
+          answers.push(answer)
 
-        return question
+          await writeFile(fileName, JSON.stringify(questions), {
+            encoding: 'utf-8'
+          })
+
+          return question
+          // otherwise return error
+        } else {
+          throw new Error('User cannot answer the same question more than once')
+        }
       } else {
         throw new Error("id doesn't match uuidv4 pattern")
       }
