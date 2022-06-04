@@ -10,6 +10,8 @@ REST API for simple questions and answers submissions.
 - [Preqrequisities](#preqrequisities)
 - [Run API](#to-run-api)
 - [Postman collection](#postman-collection)
+- [API endpoints](#api-endpoints)
+- [Middleware](#repositories-middleware)
 - [Tests](#tests)
   - [To run](#to-run)
   - [Get questions](#get-questions)
@@ -60,6 +62,28 @@ npm run start
 ### Additional Postman collection file
 
 [Link to Postman file](./frompoland-backend-task.postman_collection.json)
+
+## API endpoints
+
+| Endpoint                                   | Method | Authenticated | Action                           |
+| :----------------------------------------- | :----: | :-----------: | :------------------------------- |
+| `/questions`                               |  GET   |       -       | Get questions                    |
+| `/questions`                               |  POST  |       -       | Create question                  |
+| `/questions/:questionId`                   |  GET   |       -       | Get question by id               |
+| `/questions/:questionId/answers`           |  GET   |       -       | Get answers of specific question |
+| `/questions/:questionId/answers`           |  POST  |       -       | Create answer                    |
+| `/questions/:questionId/answers/:answerId` |  GET   |       -       | Get answer by id                 |
+
+## Repositories middleware
+
+### Middleware applied to request which create question repository.
+
+```javascript
+module.exports = fileName => (req, res, next) => {
+  req.repositories = { questionRepo: makeQuestionRepository(fileName) }
+  next()
+}
+```
 
 ## Tests
 
