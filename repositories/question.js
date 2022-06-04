@@ -20,81 +20,64 @@ const makeQuestionRepository = fileName => {
 
   const getQuestionById = async questionId => {
     try {
+      // validate if id match uuid pattern
       if (questionId.match(uuidReg)) {
         const questions = await getDatabase()
 
-        // check if question with provided id exist
-        const [question] = questions.filter(
-          question => question.id === questionId
-        )
+        const question = questions.find(q => q.id === questionId)
 
-        // if so return question
-        if (question) {
-          return questions.filter(question => question.id === questionId)
-          // otherwise throw error message
-        } else {
+        if (question === undefined) {
           throw new Error("question with this id doesn't exist")
         }
+
+        return question
       } else {
         throw new Error("id doesn't match uuidv4 pattern")
       }
     } catch (err) {
-      if (err.message.includes("doesn't exist"))
-        return { question_doesnt_exist: err.message }
-      return { id_doesnt_match_regex: err.message }
+      return {
+        fail: true,
+        err: err.message
+      }
     }
   }
 
   const addQuestion = async question => {
-    // check if same question exist already
-    const questions = await readFile(fileName, { encoding: 'utf-8' })
-    const parsedQuestions = JSON.parse(questions)
-    const [duplicateQuestion] = parsedQuestions.filter(
-      pQuestion => pQuestion['summary'] === question['summary']
-    )
-
     try {
-      if (!duplicateQuestion) {
-        if (
-          typeof question['author'] === 'string' &&
-          !parseInt(question['author'])
-        ) {
-          if (
-            typeof question['summary'] === 'string' &&
-            question['summary'].includes('?') &&
-            !parseInt(question['summary'])
-          ) {
-            const questions = await getDatabase()
+      let { summary, author } = question
 
-            // add new question
-            questions.push(question)
+      if (typeof summary === 'string' && typeof author === 'string') {
+        const questions = await getDatabase()
 
-            // assign modified stringified question array to variable
-            let arr = JSON.stringify(questions)
+        // check if question with such title already exist
+        const sameQuestion = questions.find(q => q.summary === question.summary)
 
-            // write new array to file
-            await writeFile(fileName, arr, { encoding: 'utf-8' })
+        // if not proceed
+        if (sameQuestion === undefined) {
+          // add new question
+          questions.push(question)
 
-            return questions
-          } else {
-            throw new Error(
-              'Inappropriate question provided. Value has to be string with question mark'
-            )
-          }
+          // write modified question list to file
+          await writeFile(fileName, JSON.stringify(questions), {
+            encoding: 'utf-8'
+          })
+
+          return questions
+
+          // otherwise return error
         } else {
-          throw new Error(
-            'Inappropriate author name provided. Name has to be string'
-          )
+          throw new Error('This question already exist')
         }
-      } else if (duplicateQuestion) {
-        throw new Error('This question already exist')
+      } else {
+        throw new Error(
+          'Inappropriate question provided. Author and title has to be string value'
+        )
       }
     } catch (err) {
-      if (err.message.includes('Inappropriate question'))
-        return { invalid_question: err.message }
-      else if (err.message.includes('Inappropriate author'))
-        return { invalid_author_name: err.message }
-      return { question_already_exist: err.message }
+      return {
+        fail: true,
+        err: err.message
+      }
     }
   }
 
@@ -103,148 +86,100 @@ const makeQuestionRepository = fileName => {
       if (questionId.match(uuidReg)) {
         const questions = await getDatabase()
 
-        const [question] = questions.filter(
-          question => question.id === questionId
-        )
+        const question = questions.find(q => q.id === questionId)
 
-        if (question) {
-          for (prop in question) {
-            if (prop === 'answers') {
-              return question[prop]
-            }
-          }
-        } else {
+        if (question === undefined) {
           throw new Error("question with such id doesn't exist")
         }
+
+        const { answers } = question
+
+        return answers
       } else {
         throw new Error("id doesn't match uuidv4 pattern")
       }
     } catch (err) {
-      if (err.message.includes('uuidv4'))
-        return { id_doesnt_match_regex: err.message }
-      return { question_doesnt_exist: err.message }
+      return {
+        fail: true,
+        err: err.message
+      }
     }
   }
 
   const getAnswer = async (questionId, answerId) => {
     try {
-      if (questionId.match(uuidReg)) {
-        if (answerId.match(uuidReg)) {
-          const questions = await getDatabase()
+      if (questionId.match(uuidReg) && answerId.match(uuidReg)) {
+        // get questions
+        const questions = await getDatabase()
 
-          // get question by id
-          const [question] = questions.filter(
-            question => question.id === questionId
-          )
+        // find question with provided id
+        const question = questions.find(q => q.id === questionId)
 
-          if (question) {
-            let answer
-
-            // question object
-            for (prop in question) {
-              // answers property
-              if (prop === 'answers') {
-                // iterate on answers array
-                question[prop].forEach(ans => {
-                  // iterate on answer object properties
-                  for (ansProp in ans) {
-                    if (ansProp === 'id') {
-                      if (ans[ansProp] === answerId) answer = ans
-                    }
-                  }
-                })
-                if (answer) return answer
-                else throw new Error("answer with such id doesn't exist")
-              }
-            }
-          } else {
-            throw new Error("question with such id doesn't exist")
-          }
-        } else {
-          throw new Error(
-            'Provided answer id is invalid. Id has to match uuidv4 pattern'
-          )
+        // if question doesn't exist, return error
+        if (question === undefined) {
+          throw new Error("question with such id doesn't exist")
         }
+
+        // find answer with provided id
+        const answer = question.answers.find(a => a.id === answerId)
+
+        // if answer doesn't exist, return error
+        if (answer === undefined) {
+          throw new Error("answer with such id doesn't exist")
+        }
+
+        return answer
       } else {
-        throw new Error(
-          'Provided question id is invalid. Id has to match uuidv4 pattern'
-        )
+        throw new Error("Provided id's have doesn't match uuidv4 pattern")
       }
     } catch (err) {
-      if (err.message.includes('Provided question'))
-        return {
-          invalid_question_id_datatype: err.message
-        }
-      else if (err.message.includes('Provided answer'))
-        return { invalid_answer_id_datatype: err.message }
-      else if (err.message.includes("question with such id doesn't exist"))
-        return { question_doesnt_exist: err.message }
-      return { answer_doesnt_exist: err.message }
+      return {
+        fail: true,
+        err: err.message
+      }
     }
   }
 
   const addAnswer = async (questionId, answer) => {
     try {
+      const { author, summary } = answer
+      // validate if id match uuidv4 pattern
       if (questionId.match(uuidReg)) {
-        if (
-          typeof answer['author'] === 'string' &&
-          !parseInt(answer['author'])
-        ) {
-          if (
-            typeof answer['summary'] === 'string' &&
-            !parseInt(answer['summary'])
-          ) {
-            // all questions
-            const questions = await getDatabase()
+        // get questions database
+        const questions = await getDatabase()
 
-            const [question] = questions.filter(
-              question => question.id === questionId
-            )
+        // find question by provided id
+        const question = questions.find(q => q.id === questionId)
 
-            if (question) {
-              // iterate on question fields and find answers property
-              for (prop in question) {
-                if (prop === 'answers') {
-                  // push answer to answers array property
-                  question[prop].push(answer)
+        // if question with provided id doesn't exist, return error
+        if (question === undefined)
+          throw new Error("question with this id doesn't exist")
 
-                  // save in json file new array
-                  await writeFile(fileName, JSON.stringify(questions), {
-                    encoding: 'utf-8'
-                  })
-                }
-              }
+        // get answers list
+        const { answers } = question
 
-              // return question object with new answer
-              return question
-            } else {
-              throw new Error("Question with provided id doesn't exist.")
-            }
-          } else {
-            throw new Error(
-              "Incorrect answer's title provided. Title has to be string type."
-            )
-          }
-        } else {
+        // if answer properties aren't string values, return error
+        if (typeof author !== 'string' && typeof summary !== 'string') {
           throw new Error(
-            "Incorrect answer's author provided. Author has to be string type."
+            'Author and title of question have to be string value'
           )
         }
+
+        answers.push(answer)
+
+        await writeFile(fileName, JSON.stringify(questions), {
+          encoding: 'utf-8'
+        })
+
+        return question
       } else {
-        throw new Error(
-          'Incorrect id provided. Id has to be string type and match uuid regex pattern.'
-        )
+        throw new Error("id doesn't match uuidv4 pattern")
       }
     } catch (err) {
-      if (err.message.includes('title'))
-        return { incorrect_answer_title: err.message }
-      else if (err.message.includes('author'))
-        return { incorrect_answer_author: err.message }
-      else if (err.message.includes('Incorrect id provided'))
-        return {
-          incorrect_id_provided: err.message
-        }
-      return { question_doesnt_exist: err.message }
+      return {
+        fail: true,
+        err: err.message
+      }
     }
   }
 

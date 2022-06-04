@@ -44,7 +44,7 @@ describe('question repository', () => {
   })
 
   describe('GET /questions/:id', () => {
-    test('when id match uuidv4 regex, return question by specific id', async () => {
+    test.only('when id match uuidv4 regex, return question by specific id', async () => {
       // user id
       let id = faker.datatype.uuid()
 
@@ -65,7 +65,9 @@ describe('question repository', () => {
 
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      expect(await questionRepo.getQuestionById(id)).toHaveLength(1)
+      const question = await questionRepo.getQuestionById(id)
+
+      expect(question).toStrictEqual(testQuestions[0])
     })
 
     test("when question with such id doesn't exist, return error message", async () => {
@@ -89,11 +91,9 @@ describe('question repository', () => {
 
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      const errRes = await questionRepo.getQuestionById(id)
+      const res = await questionRepo.getQuestionById(id)
 
-      expect(errRes['question_doesnt_exist']).toBe(
-        "question with this id doesn't exist"
-      )
+      expect(res['err']).toBe("question with this id doesn't exist")
     })
 
     test("when id doesn't match uuidv4 regex, return error message", async () => {
@@ -117,11 +117,9 @@ describe('question repository', () => {
 
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      const errRes = await questionRepo.getQuestionById(id)
+      const res = await questionRepo.getQuestionById(id)
 
-      expect(errRes['id_doesnt_match_regex']).toBe(
-        "id doesn't match uuidv4 pattern"
-      )
+      expect(res['err']).toBe("id doesn't match uuidv4 pattern")
     })
   })
 
@@ -192,43 +190,6 @@ describe('question repository', () => {
       const newQuestion = {
         id: faker.datatype.uuid(),
         summary: 5,
-        author: 'Norman Kowalsky',
-        answers: []
-      }
-
-      // write base 2 questions to file
-      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
-
-      // return error message
-      const resErr = await questionRepo.addQuestion(newQuestion)
-
-      // expect error message, new question has not been added due to summary field incorrect datatype
-      expect(resErr['invalid_question']).toBe(
-        'Inappropriate question provided. Value has to be string with question mark'
-      )
-    })
-
-    test('when author name datatype is incorrect, return error message', async () => {
-      // questions list
-      const testQuestions = [
-        {
-          id: faker.datatype.uuid(),
-          summary: 'What is my name?',
-          author: 'Jack London',
-          answers: []
-        },
-        {
-          id: faker.datatype.uuid(),
-          summary: 'Who are you?',
-          author: 'Tim Doods',
-          answers: []
-        }
-      ]
-
-      // new question
-      const newQuestion = {
-        id: faker.datatype.uuid(),
-        summary: 'How high kangaroo jump?',
         author: 123,
         answers: []
       }
@@ -237,11 +198,11 @@ describe('question repository', () => {
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
       // return error message
-      const resErr = await questionRepo.addQuestion(newQuestion)
+      const res = await questionRepo.addQuestion(newQuestion)
 
       // expect error message, new question has not been added due to summary field incorrect datatype
-      expect(resErr['invalid_author_name']).toBe(
-        'Inappropriate author name provided. Name has to be string'
+      expect(res['err']).toBe(
+        'Inappropriate question provided. Author and title has to be string value'
       )
     })
 
@@ -274,12 +235,10 @@ describe('question repository', () => {
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
       // return error message
-      const resErr = await questionRepo.addQuestion(duplicateQuestion)
+      const res = await questionRepo.addQuestion(duplicateQuestion)
 
       // expect error message, new question has not been added due to question duplicate
-      expect(resErr['question_already_exist']).toBe(
-        'This question already exist'
-      )
+      expect(res['err']).toBe('This question already exist')
     })
   })
 
@@ -347,11 +306,9 @@ describe('question repository', () => {
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
       // get error response
-      const errRes = await questionRepo.getAnswers(id)
+      const res = await questionRepo.getAnswers(id)
 
-      expect(errRes['question_doesnt_exist']).toBe(
-        "question with such id doesn't exist"
-      )
+      expect(res['err']).toBe("question with such id doesn't exist")
     })
 
     test("when id doesn't match uuidv4 regex", async () => {
@@ -377,11 +334,9 @@ describe('question repository', () => {
       // write questions to file
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      const errRes = await questionRepo.getAnswers(id)
+      const res = await questionRepo.getAnswers(id)
 
-      expect(errRes['id_doesnt_match_regex']).toBe(
-        "id doesn't match uuidv4 pattern"
-      )
+      expect(res['err']).toBe("id doesn't match uuidv4 pattern")
     })
   })
 
@@ -433,58 +388,9 @@ describe('question repository', () => {
       expect(singleAnswer['summary']).toBe(firstAnswer.summary)
     })
 
-    test("when question id doesn't match uuidv4 regex, return error message", async () => {
+    test("when question and answer id's doesn't match uuidv4 regex, return error message", async () => {
       // user id
       let questionId = 'someString'
-      let answerId = faker.datatype.uuid()
-
-      // sample questions
-      const testQuestions = [
-        {
-          id: questionId,
-          summary: 'What is my name?',
-          author: 'Jack London',
-          answers: []
-        },
-        {
-          id: faker.datatype.uuid(),
-          summary: 'Who are you?',
-          author: 'Tim Doods',
-          answers: []
-        }
-      ]
-
-      // write questions to file
-      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
-
-      // new answer objects
-      const firstAnswer = {
-        id: answerId,
-        summary: 'test',
-        author: 'Andrew Dude'
-      }
-
-      const secondAnswer = {
-        id: faker.datatype.uuid(),
-        summary: 'test2',
-        author: 'Michael Bay'
-      }
-
-      // add new answers
-      await questionRepo.addAnswer(questionId, firstAnswer)
-      await questionRepo.addAnswer(questionId, secondAnswer)
-
-      // get single answer
-      const errRes = await questionRepo.getAnswer(questionId, answerId)
-
-      expect(errRes['invalid_question_id_datatype']).toBe(
-        'Provided question id is invalid. Id has to match uuidv4 pattern'
-      )
-    })
-
-    test("when answer id doesn't match uuidv4 regex, return error message", async () => {
-      // user id
-      let questionId = faker.datatype.uuid()
       let answerId = 'someString'
 
       // sample questions
@@ -524,11 +430,9 @@ describe('question repository', () => {
       await questionRepo.addAnswer(questionId, secondAnswer)
 
       // get single answer
-      const errRes = await questionRepo.getAnswer(questionId, answerId)
+      const res = await questionRepo.getAnswer(questionId, answerId)
 
-      expect(errRes['invalid_answer_id_datatype']).toBe(
-        'Provided answer id is invalid. Id has to match uuidv4 pattern'
-      )
+      expect(res['err']).toBe("Provided id's have doesn't match uuidv4 pattern")
     })
 
     test("when question with provided id doesn't exist, return error message", async () => {
@@ -572,11 +476,9 @@ describe('question repository', () => {
       await questionRepo.addAnswer(questionId, secondAnswer)
 
       // get single answer
-      const errRes = await questionRepo.getAnswer(questionId, answerId)
+      const res = await questionRepo.getAnswer(questionId, answerId)
 
-      expect(errRes['question_doesnt_exist']).toBe(
-        "question with such id doesn't exist"
-      )
+      expect(res['err']).toBe("question with such id doesn't exist")
     })
 
     test("when answer with provided id doesn't exist, return error message", async () => {
@@ -613,11 +515,9 @@ describe('question repository', () => {
       await questionRepo.addAnswer(questionId, firstAnswer)
 
       // get single answer
-      const errRes = await questionRepo.getAnswer(questionId, answerId)
+      const res = await questionRepo.getAnswer(questionId, answerId)
 
-      expect(errRes['answer_doesnt_exist']).toBe(
-        "answer with such id doesn't exist"
-      )
+      expect(res['err']).toBe("answer with such id doesn't exist")
     })
   })
 
@@ -692,51 +592,12 @@ describe('question repository', () => {
       // write questions to file
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      const errRes = await questionRepo.addAnswer(questionId, newAnswer)
+      const res = await questionRepo.addAnswer(questionId, newAnswer)
 
-      expect(errRes['incorrect_id_provided']).toBe(
-        'Incorrect id provided. Id has to be string type and match uuid regex pattern.'
-      )
+      expect(res['err']).toBe("id doesn't match uuidv4 pattern")
     })
 
-    test("when answer's author field datatype is a not string, return error message", async () => {
-      // question id
-      let questionId = faker.datatype.uuid()
-
-      // sample questions
-      const testQuestions = [
-        {
-          id: questionId,
-          summary: 'What is my name?',
-          author: 'Jack London',
-          answers: []
-        },
-        {
-          id: faker.datatype.uuid(),
-          summary: 'Who are you?',
-          author: 'Tim Doods',
-          answers: []
-        }
-      ]
-
-      // new answer object
-      const newAnswer = {
-        id: faker.datatype.uuid(),
-        summary: 'test',
-        author: 123
-      }
-
-      // write questions to file
-      await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
-
-      const errRes = await questionRepo.addAnswer(questionId, newAnswer)
-
-      expect(errRes['incorrect_answer_author']).toBe(
-        "Incorrect answer's author provided. Author has to be string type."
-      )
-    })
-
-    test("when answer's title field datatype is a not string, return error message", async () => {
+    test('when answer object fields are not string type, return error message', async () => {
       // question id
       let questionId = faker.datatype.uuid()
 
@@ -760,16 +621,16 @@ describe('question repository', () => {
       const newAnswer = {
         id: faker.datatype.uuid(),
         summary: 123,
-        author: 'John Nash'
+        author: 123
       }
 
       // write questions to file
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      const errRes = await questionRepo.addAnswer(questionId, newAnswer)
+      const res = await questionRepo.addAnswer(questionId, newAnswer)
 
-      expect(errRes['incorrect_answer_title']).toBe(
-        "Incorrect answer's title provided. Title has to be string type."
+      expect(res['err']).toBe(
+        'Author and title of question have to be string value'
       )
     })
 
@@ -803,11 +664,9 @@ describe('question repository', () => {
       // write questions to file
       await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
-      const errRes = await questionRepo.addAnswer(questionId, newAnswer)
+      const res = await questionRepo.addAnswer(questionId, newAnswer)
 
-      expect(errRes['question_doesnt_exist']).toBe(
-        "Question with provided id doesn't exist."
-      )
+      expect(res['err']).toBe("question with this id doesn't exist")
     })
   })
 })
