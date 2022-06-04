@@ -131,7 +131,7 @@ const makeQuestionRepository = fileName => {
 
         return answer
       } else {
-        throw new Error("Provided id's have doesn't match uuidv4 pattern")
+        throw new Error("Provided id's doesn't match uuidv4 pattern")
       }
     } catch (err) {
       return {
