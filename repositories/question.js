@@ -12,11 +12,7 @@ const makeQuestionRepository = fileName => {
     return JSON.parse(fileContent)
   }
 
-  const getQuestions = async () => {
-    const questions = await getDatabase()
-
-    return questions
-  }
+  const getQuestions = async () => await getDatabase()
 
   const getQuestionById = async questionId => {
     try {
