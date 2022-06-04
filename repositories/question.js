@@ -12,6 +12,13 @@ const makeQuestionRepository = fileName => {
     return JSON.parse(fileContent)
   }
 
+  // modify json database
+  const updateDatabase = async content => {
+    return await writeFile(fileName, JSON.stringify(content), {
+      encoding: 'utf-8'
+    })
+  }
+
   const getQuestions = async () => await getDatabase()
 
   const getQuestionById = async questionId => {
@@ -54,9 +61,7 @@ const makeQuestionRepository = fileName => {
           questions.push(question)
 
           // write modified question list to file
-          await writeFile(fileName, JSON.stringify(questions), {
-            encoding: 'utf-8'
-          })
+          await updateDatabase(questions)
 
           return questions
 
@@ -168,9 +173,7 @@ const makeQuestionRepository = fileName => {
         if (duplicateAnswer === undefined) {
           answers.push(answer)
 
-          await writeFile(fileName, JSON.stringify(questions), {
-            encoding: 'utf-8'
-          })
+          await updateDatabase(questions)
 
           return question
           // otherwise return error
