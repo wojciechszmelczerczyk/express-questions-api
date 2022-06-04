@@ -44,7 +44,7 @@ describe('question repository', () => {
   })
 
   describe('GET /questions/:id', () => {
-    test.only('when id match uuidv4 regex, return question by specific id', async () => {
+    test('when id match uuidv4 regex, return question by specific id', async () => {
       // user id
       let id = faker.datatype.uuid()
 
