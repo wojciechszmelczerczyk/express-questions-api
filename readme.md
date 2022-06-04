@@ -31,6 +31,12 @@ REST API for simple questions and answers submissions.
 
 ## To run API
 
+### Clone repository
+
+```
+git clone https://github.com/wojciechszmelczerczyk/frompolandwithdev-recruitement-task.git
+```
+
 ### Navigate to project folder
 
 ```sh
