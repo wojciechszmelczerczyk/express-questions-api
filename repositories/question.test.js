@@ -432,7 +432,7 @@ describe('question repository', () => {
       // get single answer
       const res = await questionRepo.getAnswer(questionId, answerId)
 
-      expect(res['err']).toBe("Provided id's have doesn't match uuidv4 pattern")
+      expect(res['err']).toBe("Provided id's doesn't match uuidv4 pattern")
     })
 
     test("when question with provided id doesn't exist, return error message", async () => {
