@@ -20,6 +20,7 @@ REST API for simple questions and answers submissions.
   - [Get answers](#get-answers-of-specific-question)
   - [Get answer](#get-answer-by-id)
   - [Create answer](#create-answer)
+- [Hosting](#hosting)
 
 ## Techstack
 
@@ -937,3 +938,11 @@ test('when user submit answer for same question more than once, return error', a
 ```
 
 </details>
+
+## Hosting
+
+### Responder API project is hosted on Heroku, you can try out.
+
+```
+https://calm-cove-15900.herokuapp.com/
+```
