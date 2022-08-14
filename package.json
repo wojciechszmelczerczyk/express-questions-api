@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "start": "nodemon index.js"
+    "start": "node index.js"
   },
   "engines": {
     "node": "v14.19.0"
