@@ -5,7 +5,7 @@ const makeRepositories = require('./middleware/repositories')
 const { v4: uuidv4 } = require('uuid')
 
 const STORAGE_FILE_PATH = 'questions.json'
-const PORT = 3000
+const PORT = process.env.PORT || 3000
 
 const app = express()
 
