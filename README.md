@@ -66,14 +66,14 @@ npm run start
 
 ## API endpoints
 
-| Endpoint                                   | Method | Authenticated | Action                           |
-| :----------------------------------------- | :----: | :-----------: | :------------------------------- |
-| `/questions`                               |  GET   |       -       | Get questions                    |
-| `/questions`                               |  POST  |       -       | Create question                  |
-| `/questions/:questionId`                   |  GET   |       -       | Get question by id               |
-| `/questions/:questionId/answers`           |  GET   |       -       | Get answers of specific question |
-| `/questions/:questionId/answers`           |  POST  |       -       | Create answer                    |
-| `/questions/:questionId/answers/:answerId` |  GET   |       -       | Get answer by id                 |
+| Method |                               Endpoint                                |
+| :----: | :-------------------------------------------------------------------: |
+|  GET   |                [`/questions`](./docs/getQuestions.md)                 |
+|  POST  |                [`/questions`](./docs/post-question.md)                |
+|  GET   |         [`/questions/:questionId`](./docs/getQuestionById.md)         |
+|  GET   |       [`/questions/:questionId/answers`](./docs/getAnswers.md)        |
+|  POST  |       [`/questions/:questionId/answers`](./docs/post-answer.md)       |
+|  GET   | [`/questions/:questionId/answers/:answerId`](./docs/getAnswerById.md) |
 
 ## Repositories middleware
 
