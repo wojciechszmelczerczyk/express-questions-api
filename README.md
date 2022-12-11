@@ -9,7 +9,7 @@ REST API for simple questions and answers submissions.
 - [Techstack](#techstack)
 - [Preqrequisities](#preqrequisities)
 - [Run API](#to-run-api)
-- [Postman collection](#postman-collection)
+- [Postman collection](#postman-collection) -[Architecture](#architecture)
 - [API endpoints](#api-endpoints)
 - [Middleware](#repositories-middleware)
 - [Tests](#tests)
@@ -60,9 +60,21 @@ npm run start
 
 ## Postman collection
 
-### Additional Postman collection file
+Additional Postman collection file
 
-[Link to Postman file](./frompoland-backend-task.postman_collection.json)
+[Postman file](./frompoland-backend-task.postman_collection.json)
+
+## Architecture
+
+App implements REST API architecture style. Client communicate with Express Server.
+
+Data is being saved to JSON file.
+
+<details>
+<summary>App architecture</summary>
+
+<img src="./.github/img/arch.png">
+</details>
 
 ## API endpoints
 
@@ -77,7 +89,7 @@ npm run start
 
 ## Repositories middleware
 
-### Middleware applied to request which create question repository.
+Middleware applied to request which create question repository.
 
 ```javascript
 module.exports = fileName => (req, res, next) => {
