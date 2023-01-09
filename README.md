@@ -950,11 +950,3 @@ test('when user submit answer for same question more than once, return error', a
 ```
 
 </details>
-
-## Hosting
-
-### Responder API project is hosted on Heroku, you can try out.
-
-```
-https://calm-cove-15900.herokuapp.com/
-```
