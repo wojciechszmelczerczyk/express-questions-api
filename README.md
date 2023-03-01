@@ -9,7 +9,8 @@ REST API for simple questions and answers submissions.
 - [Techstack](#techstack)
 - [Preqrequisities](#preqrequisities)
 - [Run API](#to-run-api)
-- [Postman collection](#postman-collection) -[Architecture](#architecture)
+- [Postman collection](#postman-collection)
+- [Architecture](#architecture)
 - [API endpoints](#api-endpoints)
 - [Middleware](#repositories-middleware)
 - [Tests](#tests)
@@ -20,7 +21,6 @@ REST API for simple questions and answers submissions.
   - [Get answers](#get-answers-of-specific-question)
   - [Get answer](#get-answer-by-id)
   - [Create answer](#create-answer)
-- [Hosting](#hosting)
 
 ## Techstack
 
@@ -28,7 +28,7 @@ REST API for simple questions and answers submissions.
 - `Express.js`
 - `Jest`
 
-## Preqrequisities
+## Prerequisities
 
 - installed `node.js` in `16.x` version.
 
@@ -78,25 +78,14 @@ Data is being saved to JSON file.
 
 ## API endpoints
 
-| Method |                               Endpoint                                |
-| :----: | :-------------------------------------------------------------------: |
-|  GET   |                [`/questions`](./docs/getQuestions.md)                 |
-|  POST  |                [`/questions`](./docs/post-question.md)                |
-|  GET   |         [`/questions/:questionId`](./docs/getQuestionById.md)         |
-|  GET   |       [`/questions/:questionId/answers`](./docs/getAnswers.md)        |
-|  POST  |       [`/questions/:questionId/answers`](./docs/post-answer.md)       |
+| Method | Endpoint                                                              |
+| :----: | :-------------------------------------------------------------------- |
+|  GET   | [`/questions`](./docs/getQuestions.md)                                |
+|  POST  | [`/questions`](./docs/post-question.md)                               |
+|  GET   | [`/questions/:questionId`](./docs/getQuestionById.md)                 |
+|  GET   | [`/questions/:questionId/answers`](./docs/getAnswers.md)              |
+|  POST  | [`/questions/:questionId/answers`](./docs/post-answer.md)             |
 |  GET   | [`/questions/:questionId/answers/:answerId`](./docs/getAnswerById.md) |
-
-## Repositories middleware
-
-Middleware applied to request which create question repository.
-
-```javascript
-module.exports = fileName => (req, res, next) => {
-  req.repositories = { questionRepo: makeQuestionRepository(fileName) }
-  next()
-}
-```
 
 ## Tests
 
